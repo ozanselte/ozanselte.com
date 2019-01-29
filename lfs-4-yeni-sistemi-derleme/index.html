@@ -1,0 +1,2687 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="">
+<link rel='icon' type='image/x-icon' href='/images/site/favicon.ico'>
+<title>LFS 4 - Yeni Sistemi Derleme</title>
+<meta name="description" content="Bir upuzun derleme sürecinin daha başına geldik. En uzunu bu olacak gibi görünüyor. Geçen yazılardan pek farkı yok, hızlıca bash komutlarını verip geçeceğim....">
+<link rel="canonical" href="https://www.ozanselte.com//lfs-4-yeni-sistemi-derleme/">
+<meta name="keywords" content=", , , , ">
+<meta name="referrer" content="origin">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link href="/assets/css/style.css" rel="stylesheet">
+<style>
+header {
+background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.25)), url("/images/post_covers/red_keyboard.jpg") no-repeat scroll center center / cover;
+}
+</style>
+</head>
+<body>
+<header class="container-fluid">
+<nav class="navbar navbar-expand-md navbar-dark">
+<div class="container">
+<a class="navbar-brand" href="/">Ozan Şelte</a>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ml-auto">
+
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" href="#" id="navbarDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Kategoriler</a>
+<div class="dropdown-menu" aria-labelledby="navbarDrop">
+<a class="dropdown-item" href="/programlama">Programlama</a><a class="dropdown-item" href="/genel">Genel</a><a class="dropdown-item" href="/linux">Linux</a><a class="dropdown-item" href="/c-ve-c++">C ve C++</a><a class="dropdown-item" href="/oyun-programlama">Oyun Programlama</a>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+<div class="text-center">
+<a href="/" title=""><img class="rounded mx-auto d-block" alt="" src="/images/site/ozanselte.png"></a><h1><a href="/" title="">Ozan Şelte</a><br><small>Mühendis Adayı</small></h1>
+</div>
+</header>
+<br>
+<div class="container"><div class="row">
+<article class="col-sm-12 text-justify">
+<h1>LFS 4 - Yeni Sistemi Derleme<br><small>17 Ağustos 2015 - 
+<a href="/linux"><strong class="d-inline-block mb-2 mr-3" style="color: var(--purple);">Linux</strong></a></small></h1>
+<p>Bir upuzun derleme sürecinin daha başına geldik. En uzunu bu olacak gibi görünüyor. Geçen yazılardan pek farkı yok, hızlıca <em>bash</em> komutlarını verip geçeceğim. Bir önceki yazıdaki tekrar giriş yapılırsa uygulanması gerekenleri uygulayın yeni sistemin içine girin ve devam edelim.</p>
+
+<blockquote>
+  <p>Örnek çıktılar 32bit sistem için verilmiştir. Ufak farklılıklar olabilir. (lib &gt; lib64)</p>
+</blockquote>
+
+<h4 id="linux-api-headers">Linux API Headers</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 662 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf linux-3.19.tar.xz
+<span class="nb">cd </span>linux-3.19
+
+make mrproper
+make <span class="nv">INSTALL_HDR_PATH</span><span class="o">=</span>dest headers_install
+find dest/include <span class="se">\(</span> <span class="nt">-name</span> .install <span class="nt">-o</span> <span class="nt">-name</span> ..install.cmd <span class="se">\)</span> <span class="nt">-delete</span>
+cp <span class="nt">-rv</span> dest/include/<span class="k">*</span> /usr/include
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> linux-3.19/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="man-pages">Man-pages</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 35 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf man-pages-3.79.tar.xz
+<span class="nb">cd </span>man-pages-3.79
+
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> man-pages-3.79/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="glibc">Glibc</h4>
+<p>Derleme süresi: 16.3 SBU, Gerekli disk alanı: 1.1 GB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf glibc-2.21.tar.xz
+<span class="nb">cd </span>glibc-2.21
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../glibc-2.21-fhs-1.patch
+
+sed <span class="nt">-e</span> <span class="s1">'/ia32/s/^/1:/'</span> <span class="se">\</span>
+    <span class="nt">-e</span> <span class="s1">'/SSE2/s/^1://'</span> <span class="se">\</span>
+    <span class="nt">-i</span>  sysdeps/i386/i686/multiarch/mempcpy_chk.S
+mkdir <span class="nt">-v</span> ../glibc-build
+<span class="nb">cd</span> ../glibc-build
+
+../glibc-2.21/configure    <span class="se">\</span>
+    <span class="nt">--prefix</span><span class="o">=</span>/usr          <span class="se">\</span>
+    <span class="nt">--disable-profile</span>      <span class="se">\</span>
+    <span class="nt">--enable-kernel</span><span class="o">=</span>2.6.32 <span class="se">\</span>
+    <span class="nt">--enable-obsolete-rpc</span>
+make
+touch /etc/l.so.conf
+make install
+
+cp <span class="nt">-v</span> ../glibc-2.21/nscd/nscd.conf /etc/nscd.conf
+mkdir <span class="nt">-pv</span> /var/cache/nscd
+
+<span class="c"># zaten ileride ayarlayacağımız için kitaptaki tüm örnek yerel dosyaları kuruyorum</span>
+mkdir <span class="nt">-pv</span> /usr/lib/locale
+localedef <span class="nt">-i</span> cs_CZ <span class="nt">-f</span> UTF-8 cs_CZ.UTF-8
+localedef <span class="nt">-i</span> de_DE <span class="nt">-f</span> ISO-8859-1 de_DE
+localedef <span class="nt">-i</span> de_DE@euro <span class="nt">-f</span> ISO-8859-15 de_DE@euro
+localedef <span class="nt">-i</span> de_DE <span class="nt">-f</span> UTF-8 de_DE.UTF-8
+localedef <span class="nt">-i</span> en_GB <span class="nt">-f</span> UTF-8 en_GB.UTF-8
+localedef <span class="nt">-i</span> en_HK <span class="nt">-f</span> ISO-8859-1 en_HK
+localedef <span class="nt">-i</span> en_PH <span class="nt">-f</span> ISO-8859-1 en_PH
+localedef <span class="nt">-i</span> en_US <span class="nt">-f</span> ISO-8859-1 en_US
+localedef <span class="nt">-i</span> en_US <span class="nt">-f</span> UTF-8 en_US.UTF-8
+localedef <span class="nt">-i</span> es_MX <span class="nt">-f</span> ISO-8859-1 es_MX
+localedef <span class="nt">-i</span> fa_IR <span class="nt">-f</span> UTF-8 fa_IR
+localedef <span class="nt">-i</span> fr_FR <span class="nt">-f</span> ISO-8859-1 fr_FR
+localedef <span class="nt">-i</span> fr_FR@euro <span class="nt">-f</span> ISO-8859-15 fr_FR@euro
+localedef <span class="nt">-i</span> fr_FR <span class="nt">-f</span> UTF-8 fr_FR.UTF-8
+localedef <span class="nt">-i</span> it_IT <span class="nt">-f</span> ISO-8859-1 it_IT
+localedef <span class="nt">-i</span> it_IT <span class="nt">-f</span> UTF-8 it_IT.UTF-8
+localedef <span class="nt">-i</span> ja_JP <span class="nt">-f</span> EUC-JP ja_JP
+localedef <span class="nt">-i</span> ru_RU <span class="nt">-f</span> KOI8-R ru_RU.KOI8-R
+localedef <span class="nt">-i</span> ru_RU <span class="nt">-f</span> UTF-8 ru_RU.UTF-8
+localedef <span class="nt">-i</span> tr_TR <span class="nt">-f</span> UTF-8 tr_TR.UTF-8
+localedef <span class="nt">-i</span> zh_CN <span class="nt">-f</span> GB18030 zh_CN.GB18030
+make localedata/install-locales
+
+<span class="nb">cat</span> <span class="o">&gt;</span> /etc/nsswitch.conf &lt;&lt; <span class="s2">"EOF"</span>
+<span class="c"># Begin /etc/nsswitch.conf</span>
+passwd: files
+group: files
+shadow: files
+hosts: files dns
+networks: files
+protocols: files
+services: files
+ethers: files
+rpc: files
+<span class="c"># End /etc/nsswitch.conf</span>
+EOF
+
+<span class="nb">tar </span>xvf ../tzdata2015a.tar.gz
+
+<span class="nv">ZONEINFO</span><span class="o">=</span>/usr/share/zoneinfo
+mkdir <span class="nt">-pv</span> <span class="nv">$ZONEINFO</span>/<span class="o">{</span>posix,right<span class="o">}</span>
+
+<span class="k">for </span>tz <span class="k">in </span>etcetera southamerica northamerica europe africa antarctica  <span class="se">\</span>
+          asia australasia backward pacificnew systemv<span class="p">;</span> <span class="k">do
+    </span>zic <span class="nt">-L</span> /dev/null   <span class="nt">-d</span> <span class="nv">$ZONEINFO</span>       <span class="nt">-y</span> <span class="s2">"sh yearistype.sh"</span> <span class="k">${</span><span class="nv">tz</span><span class="k">}</span>
+    zic <span class="nt">-L</span> /dev/null   <span class="nt">-d</span> <span class="nv">$ZONEINFO</span>/posix <span class="nt">-y</span> <span class="s2">"sh yearistype.sh"</span> <span class="k">${</span><span class="nv">tz</span><span class="k">}</span>
+    zic <span class="nt">-L</span> leapseconds <span class="nt">-d</span> <span class="nv">$ZONEINFO</span>/right <span class="nt">-y</span> <span class="s2">"sh yearistype.sh"</span> <span class="k">${</span><span class="nv">tz</span><span class="k">}</span>
+<span class="k">done
+
+</span>cp <span class="nt">-v</span> zone.tab zone1970.tab iso3166.tab <span class="nv">$ZONEINFO</span>
+zic <span class="nt">-d</span> <span class="nv">$ZONEINFO</span> <span class="nt">-p</span> America/New_York
+<span class="nb">unset </span>ZONEINFO
+
+tzselect# 8 47 1 sayılarını girerek Europe/Istanbul<span class="s1">'u seçip onaylıyoruz.
+cp -v /usr/share/zoneinfo/Europe/Istanbul /etc/localtime
+
+cat &gt; /etc/ld.so.conf &lt;&lt; "EOF"
+# Begin /etc/ld.so.conf
+/usr/local/lib
+/opt/lib
+
+EOF
+
+cat &gt;&gt; /etc/ld.so.conf &lt;&lt; "EOF"
+# Add an include directory
+include /etc/ld.so.conf.d/*.conf
+
+EOF
+mkdir -pv /etc/ld.so.conf.d
+
+cd /sources
+rm -rf glibc-2.21/
+rm -rf glibc-build/</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h3 id="araçları-ayarlanmak">Araçları ayarlanmak</h3>
+<p>Hızlıca derleyicimi test edecek ve ufak ayarlar yapacağız.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources
+mv <span class="nt">-v</span> /tools/bin/<span class="o">{</span>ld,ld-old<span class="o">}</span>
+mv <span class="nt">-v</span> /tools/<span class="k">$(</span>gcc <span class="nt">-dumpmachine</span><span class="k">)</span>/bin/<span class="o">{</span>ld,ld-old<span class="o">}</span>
+mv <span class="nt">-v</span> /tools/bin/<span class="o">{</span>ld-new,ld<span class="o">}</span>
+ln <span class="nt">-sv</span> /tools/bin/ld /tools/<span class="k">$(</span>gcc <span class="nt">-dumpmachine</span><span class="k">)</span>/bin/ld
+
+gcc <span class="nt">-dumpspecs</span> | sed <span class="nt">-e</span> <span class="s1">'s@/tools@@g'</span>                   <span class="se">\</span>
+    <span class="nt">-e</span> <span class="s1">'/\*startfile_prefix_spec:/{n;s@.*@/usr/lib/ @}'</span> <span class="se">\</span>
+    <span class="nt">-e</span> <span class="s1">'/\*cpp:/{n;s@$@ -isystem /usr/include@}'</span> <span class="o">&gt;</span>      <span class="se">\</span>
+    <span class="sb">`</span>dirname <span class="k">$(</span>gcc <span class="nt">--print-libgcc-file-name</span><span class="k">)</span><span class="sb">`</span>/specs
+
+<span class="nb">echo</span> <span class="s1">'main(){}'</span> <span class="o">&gt;</span> dummy.c
+cc dummy.c <span class="nt">-v</span> <span class="nt">-Wl</span>,--verbose &amp;&gt; dummy.log
+readelf <span class="nt">-l</span> a.out | <span class="nb">grep</span> <span class="s1">': /lib'</span>
+<span class="c"># &gt; [Requesting program interpreter: /lib/ld-linux.so.2]</span>
+
+<span class="nb">grep</span> <span class="nt">-o</span> <span class="s1">'/usr/lib.*/crt[1in].*succeeded'</span> dummy.log
+<span class="c"># &gt; /usr/lib/crt1.o succeeded</span>
+<span class="c"># &gt; /usr/lib/crti.o succeeded</span>
+<span class="c"># &gt; /usr/lib/crtn.o succeeded</span>
+
+<span class="nb">grep</span> <span class="nt">-B1</span> <span class="s1">'^ /usr/include'</span> dummy.log
+<span class="c"># &gt;# include &lt;...&gt; search starts here:</span>
+<span class="c"># &gt; /usr/include</span>
+
+<span class="nb">grep</span> <span class="s1">'SEARCH.*/usr/lib'</span> dummy.log |sed <span class="s1">'s|; |\n|g'</span>
+<span class="c"># &gt; SEARCH_DIR("/usr/lib")</span>
+<span class="c"># &gt; SEARCH_DIR("/lib");</span>
+
+<span class="nb">grep</span> <span class="s2">"/lib.*/libc.so.6 "</span> dummy.log
+<span class="c"># &gt; attempt to open /lib/libc.so.6 succeeded</span>
+
+<span class="nb">grep </span>found dummy.log
+<span class="c"># &gt; found ld-linux.so.2 at /lib/ld-linux.so.2</span>
+
+rm <span class="nt">-v</span> dummy.c a.out dummy.log</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="zlib">Zlib</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 4.1 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf zlib-1.2.8.tar.xz
+<span class="nb">cd </span>zlib-1.2.8
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+mv <span class="nt">-v</span> /usr/lib/libz.so.<span class="k">*</span> /lib
+ln <span class="nt">-sfv</span> ../../lib/<span class="k">$(</span>readlink /usr/lib/libz.so<span class="k">)</span> /usr/lib/libz.so
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> zlib-1.2.8/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="file">File</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 16 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf file-5.22.tar.gz
+<span class="nb">cd </span>file-5.22
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> file-5.22/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="binutils">Binutils</h4>
+<p>Derleme süresi: 2.2 SBU, Gerekli disk alanı: 473 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf binutils-2.25.tar.bz2
+<span class="nb">cd </span>binutils-2.25
+
+expect <span class="nt">-c</span> <span class="s2">"spawn ls"</span>
+<span class="c"># &gt; spawn ls</span>
+mkdir <span class="nt">-v</span> ../binutils-build
+<span class="nb">cd</span> ../binutils-build
+
+../binutils-2.25/configure <span class="nt">--prefix</span><span class="o">=</span>/usr   <span class="se">\</span>
+    <span class="nt">--enable-shared</span> <span class="se">\</span>
+    <span class="nt">--disable-werror</span>
+make <span class="nv">tooldir</span><span class="o">=</span>/usr
+make <span class="nv">tooldir</span><span class="o">=</span>/usr install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> binutils-2.25/
+rm <span class="nt">-rf</span> binutils-binutils/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gmp">GMP</h4>
+<p>Derleme süresi: 1.3 SBU, Gerekli disk alanı: 65 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources
+<span class="nb">tar </span>xvf gmp-6.0.0a.tar.xz
+<span class="nb">cd </span>gmp-6.0.0
+
+<span class="c"># 32bit</span>
+<span class="nv">ABI</span><span class="o">=</span>32 ./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="se">\</span>
+       <span class="nt">--enable-cxx</span>  <span class="se">\</span>
+       <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/gmp-6.0.0a
+<span class="c"># 64bit</span>
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="se">\</span>
+       <span class="nt">--enable-cxx</span>  <span class="se">\</span>
+       <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/gmp-6.0.0a
+
+make
+make html
+make install
+make install-html
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> gmp-6.0.0a/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="mpfr">MPFR</h4>
+<p>Derleme süresi: 0.7 SBU, Gerekli disk alanı: 30 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf mpfr-3.1.2.tar.xz
+<span class="nb">cd </span>mpfr-3.1.2
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../mpfr-3.1.2-upstream_fixes-3.patch
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr        <span class="se">\</span>
+            <span class="nt">--enable-thread-safe</span> <span class="se">\</span>
+            <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/mpfr-3.1.2
+make
+make html
+make install
+make install-html
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> mpfr-3.1.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="mpc">MPC</h4>
+<p>Derleme süresi: 0.3 SBU, Gerekli disk alanı: 11.2 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf mpc-1.0.2.tar.gz
+<span class="nb">cd </span>mpc-1.0.2
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/mpc-1.0.2
+make
+make html
+make install
+make install-html
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> mpc-1.0.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gcc">GCC</h4>
+<p>Derleme süresi: 63 SBU(testler ile birlikte), Gerekli disk alanı: 2.9 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf gcc-4.9.2.tar.bz2
+<span class="nb">cd </span>gcc-4.9.2
+
+mkdir <span class="nt">-v</span> ../gcc-build
+<span class="nb">cd</span> ../gcc-build
+
+<span class="nv">SED</span><span class="o">=</span>sed                       <span class="se">\</span>
+../gcc-4.9.2/configure        <span class="se">\</span>
+     <span class="nt">--prefix</span><span class="o">=</span>/usr            <span class="se">\</span>
+     <span class="nt">--enable-languages</span><span class="o">=</span>c,c++ <span class="se">\</span>
+     <span class="nt">--disable-multilib</span>       <span class="se">\</span>
+     <span class="nt">--disable-bootstrap</span>      <span class="se">\</span>
+     <span class="nt">--with-system-zlib</span>
+make
+make install
+
+ln <span class="nt">-sv</span> ../usr/bin/cpp /lib
+ln <span class="nt">-sv</span> gcc /usr/bin/cc
+install <span class="nt">-v</span> <span class="nt">-dm755</span> /usr/lib/bfd-plugins
+ln <span class="nt">-sfv</span> ../../libexec/gcc/<span class="k">$(</span>gcc <span class="nt">-dumpmachine</span><span class="k">)</span>/4.9.2/liblto_plugin.so /usr/lib/bfd-plugins/
+
+<span class="nb">echo</span> <span class="s1">'main(){}'</span> <span class="o">&gt;</span> dummy.c
+cc dummy.c <span class="nt">-v</span> <span class="nt">-Wl</span>,--verbose &amp;&gt; dummy.log
+readelf <span class="nt">-l</span> a.out | <span class="nb">grep</span> <span class="s1">': /lib'</span>
+<span class="c"># &gt; [Requesting program interpreter: /lib/ld-linux.so.2]</span>
+<span class="nb">grep</span> <span class="nt">-o</span> <span class="s1">'/usr/lib.*/crt[1in].*succeeded'</span> dummy.log
+<span class="c"># &gt; /usr/lib/gcc/i686-pc-linux-gnu/4.9.2/../../../crt1.o succeeded</span>
+<span class="c"># &gt; /usr/lib/gcc/i686-pc-linux-gnu/4.9.2/../../../crti.o succeeded</span>
+<span class="c"># &gt; /usr/lib/gcc/i686-pc-linux-gnu/4.9.2/../../../crtn.o succeeded</span>
+<span class="nb">grep</span> <span class="nt">-B4</span> <span class="s1">'^ /usr/include'</span> dummy.log
+<span class="c"># &gt;# include &lt;...&gt; search starts here:</span>
+<span class="c"># &gt; /usr/lib/gcc/i686-pc-linux-gnu/4.9.2/include</span>
+<span class="c"># &gt; /usr/local/include</span>
+<span class="c"># &gt; /usr/lib/gcc/i686-pc-linux-gnu/4.9.2/include-fixed</span>
+<span class="c"># &gt; /usr/include</span>
+<span class="nb">grep</span> <span class="s1">'SEARCH.*/usr/lib'</span> dummy.log |sed <span class="s1">'s|; |\n|g'</span>
+<span class="c"># &gt; SEARCH_DIR("/usr/i686-pc-linux-gnu/lib32")</span>
+<span class="c"># &gt; SEARCH_DIR("/usr/local/lib32")</span>
+<span class="c"># &gt; SEARCH_DIR("/lib32")</span>
+<span class="c"># &gt; SEARCH_DIR("/usr/lib32")</span>
+<span class="c"># &gt; SEARCH_DIR("/usr/i686-pc-linux-gnu/lib")</span>
+<span class="c"># &gt; SEARCH_DIR("/usr/local/lib")</span>
+<span class="c"># &gt; SEARCH_DIR("/lib")</span>
+<span class="c"># &gt; SEARCH_DIR("/usr/lib");</span>
+<span class="nb">grep</span> <span class="s2">"/lib.*/libc.so.6 "</span> dummy.log
+<span class="c"># &gt; attempt to open /lib/libc.so.6 succeeded</span>
+<span class="nb">grep </span>found dummy.log
+<span class="c"># &gt; found ld-linux.so.2 at /lib/ld-linux.so.2</span>
+rm <span class="nt">-v</span> dummy.c a.out dummy.log
+mkdir <span class="nt">-pv</span> /usr/share/gdb/auto-load/usr/lib
+mv <span class="nt">-v</span> /usr/lib/<span class="k">*</span>gdb.py /usr/share/gdb/auto-load/usr/lib
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> gcc-4.9.2/
+rm <span class="nt">-rf</span> gcc-build/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="bzip">Bzip</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 6.9 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf bzip2-1.0.6.tar.gz
+<span class="nb">cd </span>bzip2-1.0.6
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../bzip2-1.0.6-install_docs-1.patch
+
+sed <span class="nt">-i</span> <span class="s1">'s@\(ln -s -f \)$(PREFIX)/bin/@\1@'</span> Makefile
+sed <span class="nt">-i</span> <span class="s2">"s@(PREFIX)/man@(PREFIX)/share/man@g"</span> Makefile
+make <span class="nt">-f</span> Makefile-libbz2_so
+make clean
+
+make
+make <span class="nv">PREFIX</span><span class="o">=</span>/usr install
+
+cp <span class="nt">-v</span> bzip2-shared /bin/bzip2
+cp <span class="nt">-av</span> libbz2.so<span class="k">*</span> /lib
+ln <span class="nt">-sv</span> ../../lib/libbz2.so.1.0 /usr/lib/libbz2.so
+rm <span class="nt">-v</span> /usr/bin/<span class="o">{</span>bunzip2,bzcat,bzip2<span class="o">}</span>
+ln <span class="nt">-sv</span> bzip2 /bin/bunzip2
+ln <span class="nt">-sv</span> bzip2 /bin/bzcat
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> bzip2-1.0.6/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="pkg-config">Pkg-config</h4>
+<p>Derleme süresi: 0.3 SBU, Gerekli disk alanı: 30 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf pkg-config-0.28.tar.gz
+<span class="nb">cd </span>pkg-config-0.28
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr    <span class="se">\</span>
+       <span class="nt">--with-internal-glib</span>  <span class="se">\</span>
+       <span class="nt">--disable-host-tool</span>   <span class="se">\</span>
+       <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/pkg-config-0.28
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> pkg-config-0.28/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="ncurses">Ncurses</h4>
+<p>Derleme süresi: 0.5 SBU, Gerekli disk alanı: 54 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf ncurses-5.9.tar.gz
+<span class="nb">cd </span>ncurses-5.9
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr           <span class="se">\</span>
+            <span class="nt">--mandir</span><span class="o">=</span>/usr/share/man <span class="se">\</span>
+            <span class="nt">--with-shared</span>           <span class="se">\</span>
+            <span class="nt">--without-debug</span>         <span class="se">\</span>
+            <span class="nt">--enable-pc-files</span>       <span class="se">\</span>
+            <span class="nt">--enable-widec</span>
+make
+make install
+
+mv <span class="nt">-v</span> /usr/lib/libncursesw.so.5<span class="k">*</span> /lib
+ln <span class="nt">-sfv</span> ../../lib/<span class="k">$(</span>readlink /usr/lib/libncursesw.so<span class="k">)</span> /usr/lib/libncursesw.so
+
+<span class="k">for </span>lib <span class="k">in </span>ncurses form panel menu <span class="p">;</span> <span class="k">do
+    </span>rm <span class="nt">-vf</span>                    /usr/lib/lib<span class="k">${</span><span class="nv">lib</span><span class="k">}</span>.so
+    <span class="nb">echo</span> <span class="s2">"INPUT(-l</span><span class="k">${</span><span class="nv">lib</span><span class="k">}</span><span class="s2">w)"</span> <span class="o">&gt;</span> /usr/lib/lib<span class="k">${</span><span class="nv">lib</span><span class="k">}</span>.so
+    ln <span class="nt">-sfv</span> lib<span class="k">${</span><span class="nv">lib</span><span class="k">}</span>w.a      /usr/lib/lib<span class="k">${</span><span class="nv">lib</span><span class="k">}</span>.a
+    ln <span class="nt">-sfv</span> <span class="k">${</span><span class="nv">lib</span><span class="k">}</span>w.pc        /usr/lib/pkgconfig/<span class="k">${</span><span class="nv">lib</span><span class="k">}</span>.pc
+<span class="k">done
+</span>ln <span class="nt">-sfv</span> libncurses++w.a /usr/lib/libncurses++.a
+
+rm <span class="nt">-vf</span>                     /usr/lib/libcursesw.so
+<span class="nb">echo</span> <span class="s2">"INPUT(-lncursesw)"</span> <span class="o">&gt;</span> /usr/lib/libcursesw.so
+ln <span class="nt">-sfv</span> libncurses.so      /usr/lib/libcurses.so
+ln <span class="nt">-sfv</span> libncursesw.a      /usr/lib/libcursesw.a
+ln <span class="nt">-sfv</span> libncurses.a       /usr/lib/libcurses.a
+
+mkdir <span class="nt">-v</span>       /usr/share/doc/ncurses-5.9
+cp <span class="nt">-v</span> <span class="nt">-R</span> doc/<span class="k">*</span> /usr/share/doc/ncurses-5.9
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> ncurses-5.9/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="attr">Attr</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 4.2 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf attr-2.4.47.src.tar.gz
+<span class="nb">cd </span>attr-2.4.47
+
+sed <span class="nt">-i</span> <span class="nt">-e</span> <span class="s1">'s|/@pkg_name@|&amp;-@pkg_version@|'</span> include/builddefs.in
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--bindir</span><span class="o">=</span>/bin
+make
+make <span class="nt">-j</span>&lt;çekirdekSayınız&gt; <span class="nb">test
+</span>make <span class="nt">-j</span>&lt;çekirdekSayınız&gt; root-tests
+make install install-dev install-lib
+chmod <span class="nt">-v</span> 755 /usr/lib/libattr.so
+
+mv <span class="nt">-v</span> /usr/lib/libattr.so.<span class="k">*</span> /lib
+ln <span class="nt">-sfv</span> ../../lib/<span class="k">$(</span>readlink /usr/lib/libattr.so<span class="k">)</span> /usr/lib/libattr.so
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> attr-2.4.47/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="acl">Acl</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 7.7 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf acl-2.2.52.src.tar.gz
+<span class="nb">cd </span>acl-2.2.52
+
+sed <span class="nt">-i</span> <span class="nt">-e</span> <span class="s1">'s|/@pkg_name@|&amp;-@pkg_version@|'</span> include/builddefs.in
+sed <span class="nt">-i</span> <span class="s2">"s:| sed.*::g"</span> <span class="nb">test</span>/<span class="o">{</span>sbits-restore,cp,misc<span class="o">}</span>.test
+sed <span class="nt">-i</span> <span class="nt">-e</span> <span class="s2">"/TABS-1;/a if (x &gt; (TABS-1)) x = (TABS-1);"</span> <span class="se">\</span>
+    libacl/__acl_to_any_text.c
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="se">\</span>
+            <span class="nt">--bindir</span><span class="o">=</span>/bin <span class="se">\</span>
+            <span class="nt">--libexecdir</span><span class="o">=</span>/usr/lib
+make
+make install install-dev install-lib
+chmod <span class="nt">-v</span> 755 /usr/lib/libacl.so
+
+mv <span class="nt">-v</span> /usr/lib/libacl.so.<span class="k">*</span> /lib
+ln <span class="nt">-sfv</span> ../../lib/<span class="k">$(</span>readlink /usr/lib/libacl.so<span class="k">)</span> /usr/lib/libacl.so
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> acl-2.2.52/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="libcap">Libcap</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 1.8 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf libcap-2.24.tar.xz
+<span class="nb">cd </span>libcap-2.24
+
+make
+make <span class="nv">RAISE_SETFCAP</span><span class="o">=</span>no <span class="nv">prefix</span><span class="o">=</span>/usr install
+chmod <span class="nt">-v</span> 755 /usr/lib/libcap.so
+
+mv <span class="nt">-v</span> /usr/lib/libcap.so.<span class="k">*</span> /lib
+ln <span class="nt">-sfv</span> ../../lib/<span class="k">$(</span>readlink /usr/lib/libcap.so<span class="k">)</span> /usr/lib/libcap.so
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> libcap-2.24/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="sed">Sed</h4>
+<p>Derleme süresi: 0.2 SBU, Gerekli disk alanı: 12 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf sed-4.2.2.tar.bz2
+<span class="nb">cd </span>sed-4.2.2
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--bindir</span><span class="o">=</span>/bin <span class="nt">--htmldir</span><span class="o">=</span>/usr/share/doc/sed-4.2.2
+make
+make html
+make install
+make <span class="nt">-C</span> doc install-html
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> sed-4.2.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="shadow">Shadow</h4>
+<p>Derleme süresi: 0.2 SBU, Gerekli disk alanı: 52 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf shadow-4.2.1.tar.xz
+<span class="nb">cd </span>shadow-4.2.1
+
+sed <span class="nt">-i</span> <span class="s1">'s/groups$(EXEEXT) //'</span> src/Makefile.in
+find man <span class="nt">-name</span> Makefile.in <span class="nt">-exec</span> sed <span class="nt">-i</span> <span class="s1">'s/groups\.1 / /'</span> <span class="o">{}</span> <span class="se">\;</span>
+sed <span class="nt">-i</span> <span class="nt">-e</span> <span class="s1">'s@#ENCRYPT_METHOD DES@ENCRYPT_METHOD SHA512@'</span> <span class="se">\</span>
+       <span class="nt">-e</span> <span class="s1">'s@/var/spool/mail@/var/mail@'</span> etc/login.defs
+
+sed <span class="nt">-i</span> <span class="s1">'s/1000/999/'</span> etc/useradd
+./configure <span class="nt">--sysconfdir</span><span class="o">=</span>/etc <span class="nt">--with-group-name-max-length</span><span class="o">=</span>32
+make
+make install
+mv <span class="nt">-v</span> /usr/bin/passwd /bin</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Şimdi de kullanıcı yapılandırmalarımızı halledelim.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="code"><pre>pwconv
+grpconv
+
+sed <span class="nt">-i</span> <span class="s1">'s/yes/no/'</span> /etc/default/useradd
+
+<span class="c"># root şifresi belirleyelim</span>
+passwd root
+
+<span class="c"># shadow ile işimiz bitti silebiliriz</span>
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> shadow-4.2.1/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="pcmisc">Pcmisc</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 4.7 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf psmisc-22.21.tar.gz
+<span class="nb">cd </span>psmisc-22.21
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+mv <span class="nt">-v</span> /usr/bin/fuser   /bin
+mv <span class="nt">-v</span> /usr/bin/killall /bin
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> psmisc-22.21/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="procps-ng">Procps-ng</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 17 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf procps-ng-3.3.10.tar.xz
+<span class="nb">cd </span>procps-ng-3.3.10
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr                           <span class="se">\</span>
+            <span class="nt">--exec-prefix</span><span class="o">=</span>                          <span class="se">\</span>
+            <span class="nt">--libdir</span><span class="o">=</span>/usr/lib                       <span class="se">\</span>
+            <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/procps-ng-3.3.10 <span class="se">\</span>
+            <span class="nt">--disable-static</span>                        <span class="se">\</span>
+            <span class="nt">--disable-kill</span>
+make
+make install
+
+mv <span class="nt">-v</span> /usr/bin/pidof /bin
+mv <span class="nt">-v</span> /usr/lib/libprocps.so.<span class="k">*</span> /lib
+ln <span class="nt">-sfv</span> ../../lib/<span class="k">$(</span>readlink /usr/lib/libprocps.so<span class="k">)</span> /usr/lib/libprocps.so
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> procps-ng-3.3.10/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="e2fsprogs">E2fsprogs</h4>
+<p>Derleme süresi: 2.7 SBU, Gerekli disk alanı: 52 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf e2fsprogs-1.42.12.tar.gz
+<span class="nb">cd </span>e2fsprogs-1.42.12
+
+sed <span class="nt">-e</span> <span class="s1">'/int.*old_desc_blocks/s/int/blk64_t/'</span> <span class="se">\</span>
+    <span class="nt">-e</span> <span class="s1">'/if (old_desc_blocks/s/super-&gt;s_first_meta_bg/desc_blocks/'</span> <span class="se">\</span>
+    <span class="nt">-i</span> lib/ext2fs/closefs.c
+mkdir <span class="nt">-v</span> build
+<span class="nb">cd </span>build
+
+<span class="nv">LIBS</span><span class="o">=</span><span class="nt">-L</span>/tools/lib                    <span class="se">\</span>
+<span class="nv">CFLAGS</span><span class="o">=</span><span class="nt">-I</span>/tools/include              <span class="se">\</span>
+<span class="nv">PKG_CONFIG_PATH</span><span class="o">=</span>/tools/lib/pkgconfig <span class="se">\</span>
+../configure <span class="nt">--prefix</span><span class="o">=</span>/usr           <span class="se">\</span>
+             <span class="nt">--bindir</span><span class="o">=</span>/bin           <span class="se">\</span>
+             <span class="nt">--with-root-prefix</span><span class="o">=</span><span class="s2">""</span>   <span class="se">\</span>
+             <span class="nt">--enable-elf-shlibs</span>     <span class="se">\</span>
+             <span class="nt">--disable-libblkid</span>      <span class="se">\</span>
+             <span class="nt">--disable-libuuid</span>       <span class="se">\</span>
+             <span class="nt">--disable-uuidd</span>         <span class="se">\</span>
+             <span class="nt">--disable-fsck</span>
+make
+make install
+makw install-libs
+
+chmod <span class="nt">-v</span> u+w /usr/lib/<span class="o">{</span>libcom_err,libe2p,libext2fs,libss<span class="o">}</span>.a
+gunzip <span class="nt">-v</span> /usr/share/info/libext2fs.info.gz
+install-info <span class="nt">--dir-file</span><span class="o">=</span>/usr/share/info/dir /usr/share/info/libext2fs.info
+
+makeinfo <span class="nt">-o</span>      doc/com_err.info ../lib/et/com_err.texinfo
+install <span class="nt">-v</span> <span class="nt">-m644</span> doc/com_err.info /usr/share/info
+install-info <span class="nt">--dir-file</span><span class="o">=</span>/usr/share/info/dir /usr/share/info/com_err.info
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> e2fsprogs-1.42.12/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="coreutils">Coreutils</h4>
+<p>Derleme süresi: 2.5 SBU, Gerekli disk alanı: 193 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf coreutils-8.23.tar.xz
+<span class="nb">cd </span>coreutils-8.23
+
+<span class="c"># gurularımız eğer hata alırsak bu iki satırı iptal ederek baştan denememizi söylüyorlar.</span>
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../coreutils-8.23-i18n-1.patch 
+touch Makefile.in
+
+<span class="nv">FORCE_UNSAFE_CONFIGURE</span><span class="o">=</span>1 ./configure <span class="se">\</span>
+            <span class="nt">--prefix</span><span class="o">=</span>/usr            <span class="se">\</span>
+            <span class="nt">--enable-no-install-program</span><span class="o">=</span><span class="nb">kill</span>,uptime
+make
+make <span class="nv">NON_ROOT_USERNAME</span><span class="o">=</span>nobody check-root
+<span class="nb">echo</span> <span class="s2">"dummy:x:1000:nobody"</span> <span class="o">&gt;&gt;</span> /etc/group
+chown <span class="nt">-Rv</span> nobody <span class="nb">.</span> 
+su nobody <span class="nt">-s</span> /bin/bash <span class="se">\</span>
+          <span class="nt">-c</span> <span class="s2">"PATH=</span><span class="nv">$PATH</span><span class="s2"> make RUN_EXPENSIVE_TESTS=yes check"</span>
+
+sed <span class="nt">-i</span> <span class="s1">'/dummy/d'</span> /etc/group
+make install
+mv <span class="nt">-v</span> /usr/bin/<span class="o">{</span><span class="nb">cat</span>,chgrp,chmod,chown,cp,date,dd,df,echo<span class="o">}</span> /bin
+mv <span class="nt">-v</span> /usr/bin/<span class="o">{</span><span class="nb">false</span>,ln,ls,mkdir,mknod,mv,pwd,rm<span class="o">}</span> /bin
+mv <span class="nt">-v</span> /usr/bin/<span class="o">{</span>rmdir,stty,sync,true,uname<span class="o">}</span> /bin
+mv <span class="nt">-v</span> /usr/bin/chroot /usr/sbin
+mv <span class="nt">-v</span> /usr/share/man/man1/chroot.1 /usr/share/man/man8/chroot.8
+sed <span class="nt">-i</span> s/<span class="se">\"</span>1<span class="se">\"</span>/<span class="se">\"</span>8<span class="se">\"</span>/1 /usr/share/man/man8/chroot.8
+mv <span class="nt">-v</span> /usr/bin/<span class="o">{</span>head,sleep,nice,test,[<span class="o">}</span> /bin
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> coreutils-8.23/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="iana-etc">Iana-Etc</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 3.0 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf iana-etc-2.30.tar.bz2
+<span class="nb">cd </span>iana-etc-2.30
+
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> iana-etc-2.30/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="m4">M4</h4>
+<p>Derleme süresi: 0.4 SBU, Gerekli disk alanı: 31 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf m4-1.4.17.tar.xz  
+<span class="nb">cd </span>m4-1.4.17
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make  
+make install
+
+<span class="nb">cd</span> /sources  
+rm <span class="nt">-rf</span> m4-1.4.17/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="flex">Flex</h4>
+<p>Derleme süresi: 0.3 SBU, Gerekli disk alanı: 38 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf flex-2.5.39.tar.bz2
+<span class="nb">cd </span>flex-2.5.39
+
+sed <span class="nt">-i</span> <span class="nt">-e</span> <span class="s1">'/test-bison/d'</span> tests/Makefile.in
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/flex-2.5.39
+make
+make install
+ln <span class="nt">-sv</span> flex /usr/bin/lex
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> flex-2.5.39/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="bison">Bison</h4>
+<p>Derleme süresi: 2.3 SBU, Gerekli disk alanı: 40 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf bison-3.0.4.tar.xz
+<span class="nb">cd </span>bison-3.0.4
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/bison-3.0.4
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> bison-3.0.4</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="grep">Grep</h4>
+<p>Derleme süresi: 0.4 SBU, Gerekli disk alanı: 30 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf grep-2.21.tar.xz
+<span class="nb">cd </span>grep-2.21
+
+sed <span class="nt">-i</span> <span class="nt">-e</span> <span class="s1">'/tp++/a  if (ep &lt;= tp) break;'</span> src/kwset.c
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--bindir</span><span class="o">=</span>/bin
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> grep-2.21/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="readline">Readline</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 24 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf readline-6.3.tar.gz
+<span class="nb">cd </span>readline-6.3
+
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../readline-6.3-upstream_fixes-3.patch
+sed <span class="nt">-i</span> <span class="s1">'/MV.*old/d'</span> Makefile.in
+sed <span class="nt">-i</span> <span class="s1">'/{OLDSUFF}/c:'</span> support/shlib-install
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/readline-6.3
+make <span class="nv">SHLIB_LIBS</span><span class="o">=</span><span class="nt">-lncurses</span>
+make <span class="nv">SHLIB_LIBS</span><span class="o">=</span><span class="nt">-lncurses</span> install
+
+mv <span class="nt">-v</span> /usr/lib/lib<span class="o">{</span>readline,history<span class="o">}</span>.so.<span class="k">*</span> /lib
+ln <span class="nt">-sfv</span> ../../lib/<span class="k">$(</span>readlink /usr/lib/libreadline.so<span class="k">)</span> /usr/lib/libreadline.so
+ln <span class="nt">-sfv</span> ../../lib/<span class="k">$(</span>readlink /usr/lib/libhistory.so <span class="k">)</span> /usr/lib/libhistory.so
+install <span class="nt">-v</span> <span class="nt">-m644</span> doc/<span class="k">*</span>.<span class="o">{</span>ps,pdf,html,dvi<span class="o">}</span> /usr/share/doc/readline-6.3
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> readline-6.3/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="bash">Bash</h4>
+<p>Derleme süresi: 1.9 SBU, Gerekli disk alanı: 57 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf bash-4.3.30.tar.gz
+<span class="nb">cd </span>bash-4.3.30
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../bash-4.3.30-upstream_fixes-1.patch
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr                    <span class="se">\</span>
+            <span class="nt">--bindir</span><span class="o">=</span>/bin                    <span class="se">\</span>
+            <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/bash-4.3.30 <span class="se">\</span>
+            <span class="nt">--without-bash-malloc</span>            <span class="se">\</span>
+            <span class="nt">--with-installed-readline</span>
+make
+
+chown <span class="nt">-Rv</span> noboy <span class="nb">.</span>
+su nobody <span class="nt">-s</span> /bin/bash <span class="nt">-c</span> <span class="s2">"PATH=</span><span class="nv">$PATH</span><span class="s2"> make tests"</span>
+
+make install <span class="nb">exec</span> /bin/bash <span class="nt">--login</span> +h
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> bash-4.3.30/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="bc">Bc</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 4 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf bc-1.06.95.tar.bz2
+<span class="nb">cd </span>bc-1.06.95
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../bc-1.06.95-memory_leak-1.patch
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr           <span class="se">\</span>
+            <span class="nt">--with-readline</span>         <span class="se">\</span>
+            <span class="nt">--mandir</span><span class="o">=</span>/usr/share/man <span class="se">\</span>
+            <span class="nt">--infodir</span><span class="o">=</span>/usr/share/info
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> bc-1.06.95/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="libtool">Libtool</h4>
+<p>Derleme süresi: 2 SBU, Gerekli disk alanı: 48 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf libtool-2.4.6.tar.xz
+<span class="nb">cd </span>libtool-2.4.6
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> libtool-2.4.6/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gdbm">GDBM</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 12.6 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf gdbm-1.11.tar.gz
+<span class="nb">cd </span>gdbm-1.11
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--enable-libgdbm-compat</span>
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> gdbm-1.11/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="expat">Expat</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 11 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf expat-2.1.0.tar.gz
+<span class="nb">cd </span>expat-2.1.0
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+install <span class="nt">-v</span> <span class="nt">-dm755</span> /usr/share/doc/expat-2.1.0
+install <span class="nt">-v</span> <span class="nt">-m644</span> doc/<span class="k">*</span>.<span class="o">{</span>html,png,css<span class="o">}</span> /usr/share/doc/expat-2.1.0
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> expat-2.1.0/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="inetutils">Inetutils</h4>
+<p>Derleme süresi: 0.4 SBU, Gerekli disk alanı: 34 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf inetutils-1.9.2.tar.gz
+<span class="nb">cd </span>inetutils-1.9.2
+
+<span class="nb">echo</span> <span class="s1">'#define PATH_PROCNET_DEV "/proc/net/dev"'</span> <span class="o">&gt;&gt;</span> ifconfig/system/linux.h 
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr  <span class="se">\</span>
+            <span class="nt">--localstatedir</span><span class="o">=</span>/var   <span class="se">\</span>
+            <span class="nt">--disable-logger</span>       <span class="se">\</span>
+            <span class="nt">--disable-whois</span>        <span class="se">\</span>
+            <span class="nt">--disable-servers</span>
+make
+make install
+
+mv <span class="nt">-v</span> /usr/bin/<span class="o">{</span>hostname,ping,ping6,traceroute<span class="o">}</span> /bin
+mv <span class="nt">-v</span> /usr/bin/ifconfig /sbin
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> inetutils-1.9.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="perl">Perl</h4>
+<p>Derleme süresi: 6.5 SBU, Gerekli disk alanı: 301 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf perl-5.20.2.tar.bz2
+<span class="nb">cd </span>perl-5.20.2
+
+<span class="nb">echo</span> <span class="s2">"127.0.0.1 localhost </span><span class="k">$(</span>hostname<span class="k">)</span><span class="s2">"</span> <span class="o">&gt;</span> /etc/hosts
+
+<span class="nb">export </span><span class="nv">BUILD_ZLIB</span><span class="o">=</span>False
+<span class="nb">export </span><span class="nv">BUILD_BZIP2</span><span class="o">=</span>0
+sh Configure <span class="nt">-des</span> <span class="nt">-Dprefix</span><span class="o">=</span>/usr                 <span class="se">\</span>
+                  <span class="nt">-Dvendorprefix</span><span class="o">=</span>/usr           <span class="se">\</span>
+                  <span class="nt">-Dman1dir</span><span class="o">=</span>/usr/share/man/man1 <span class="se">\</span>
+                  <span class="nt">-Dman3dir</span><span class="o">=</span>/usr/share/man/man3 <span class="se">\</span>
+                  <span class="nt">-Dpager</span><span class="o">=</span><span class="s2">"/usr/bin/less -isR"</span>  <span class="se">\</span>
+                  <span class="nt">-Duseshrplib</span>
+make
+make install
+<span class="nb">unset </span>BUILD_ZLIB BUILD_BZIP2
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> perl-5.20.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="xmlparser">XML::Parser</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 2.4 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf XML-Parser-2.44.tar.gz
+<span class="nb">cd </span>XML-Parser-2.44
+
+perl Makefile.PL
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> XML-Parser-2.44/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="autoconf">Autoconf</h4>
+<p>Derleme süresi: 3.6 SBU, Gerekli disk alanı: 20 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf autoconf-2.69.tar.xz
+<span class="nb">cd </span>autoconf-2.69
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> autoconf-2.69/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="automake">Automake</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 109 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf automake-1.15.tar.xz
+<span class="nb">cd </span>automake-1.15
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/automake-1.15
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> automake-1.15/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="diffutils">Diffutils</h4>
+<p>Derleme süresi: 0.4 SBU, Gerekli disk alanı: 30 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf diffutils-3.3.tar.xz
+<span class="nb">cd </span>diffutils-3.3
+
+sed <span class="nt">-i</span> <span class="s1">'s:= @mkdir_p@:= /bin/mkdir -p:'</span> po/Makefile.in.in
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> diffutils-3.3/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gawk">Gawk</h4>
+<p>Derleme süresi: 0.3 SBU, Gerekli disk alanı: 39 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf gawk-4.1.1.tar.xz
+<span class="nb">cd </span>gawk-4.1.1
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+mkdir <span class="nt">-v</span> /usr/share/doc/gawk-4.1.1
+cp    <span class="nt">-v</span> doc/<span class="o">{</span>awkforai.txt,<span class="k">*</span>.<span class="o">{</span>eps,pdf,jpg<span class="o">}}</span> /usr/share/doc/gawk-4.1.1
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> gawk-4.1.1/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="findutils">Findutils</h4>
+<p>Derleme süresi: 0.4 SBU, Gerekli disk alanı: 32 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf findutils-4.4.2.tar.gz
+<span class="nb">cd </span>findutils-4.4.2
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--localstatedir</span><span class="o">=</span>/var/lib/locate
+make
+make install
+
+mv <span class="nt">-v</span> /usr/bin/find /bin
+sed <span class="nt">-i</span> <span class="s1">'s|find:=${BINDIR}|find:=/bin|'</span> /usr/bin/updatedb
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> findutils-4.4.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gettext">Gettext</h4>
+<p>Derleme süresi: 4.9 SBU, Gerekli disk alanı: 229 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf gettext-0.19.4.tar.xz
+<span class="nb">cd </span>gettext-0.19.4
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/gettext-0.19.4
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> gettext-0.19.4/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="intltool">Intltool</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 1.3 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf intltool-0.50.2.tar.gz
+<span class="nb">cd </span>intltool-0.50.2
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+install <span class="nt">-v</span> <span class="nt">-Dm644</span> doc/I18N-HOWTO /usr/share/doc/intltool-0.50.2/I18N-HOWTO
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> intltool-0.50.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gperf">Gperf</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 6 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf gperf-3.0.4.tar.gz
+<span class="nb">cd </span>gperf-3.0.4
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/gperf-3.0.4
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> gperf-3.0.4/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="groff">Groff</h4>
+<p>Derleme süresi: 0.5 SBU, Gerekli disk alanı: 111 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf groff-1.22.3.tar.gz
+<span class="nb">cd </span>groff-1.22.3
+
+<span class="nv">PAGE</span><span class="o">=</span>A4 ./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> groff-1.22.3/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="xz">Xz</h4>
+<p>Derleme süresi: 0.4 SBU, Gerekli disk alanı: 22 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf xz-5.2.0.tar.xz
+<span class="nb">cd </span>xz-5.2.0
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/xz-5.2.0
+make
+make install
+
+mv <span class="nt">-v</span>   /usr/bin/<span class="o">{</span>lzma,unlzma,lzcat,xz,unxz,xzcat<span class="o">}</span> /bin
+mv <span class="nt">-v</span> /usr/lib/liblzma.so.<span class="k">*</span> /lib
+ln <span class="nt">-svf</span> ../../lib/<span class="k">$(</span>readlink /usr/lib/liblzma.so<span class="k">)</span> /usr/lib/liblzma.so
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> xz-5.2.0/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="grub">GRUB</h4>
+<p>Derleme süresi: 0.8 SBU, Gerekli disk alanı: 170 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf grub-2.02~beta2.tar.xz
+<span class="nb">cd </span>grub-2.02~beta2
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr          <span class="se">\</span>
+            <span class="nt">--sbindir</span><span class="o">=</span>/sbin        <span class="se">\</span>
+            <span class="nt">--sysconfdir</span><span class="o">=</span>/etc      <span class="se">\</span>
+            <span class="nt">--disable-grub-emu-usb</span> <span class="se">\</span>
+            <span class="nt">--disable-efiemu</span>       <span class="se">\</span>
+            <span class="nt">--disable-werror</span>
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> grub-2.02~beta2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="less">Less</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 4.1 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf less-458.tar.gz
+<span class="nb">cd </span>less-458
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--sysconfdir</span><span class="o">=</span>/etc
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> less-458/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gzip">Gzip</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 20 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf gzip-1.6.tar.xz
+<span class="nb">cd </span>gzip-1.6
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--bindir</span><span class="o">=</span>/bin
+make
+make install
+
+mv <span class="nt">-v</span> /bin/<span class="o">{</span>gzexe,uncompress,zcmp,zdiff,zegrep<span class="o">}</span> /usr/bin
+mv <span class="nt">-v</span> /bin/<span class="o">{</span>zfgrep,zforce,zgrep,zless,zmore,znew<span class="o">}</span> /usr/bin
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> gzip-1.6/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="iproute">IPRoute</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 10.6 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf iproute2-3.19.0.tar.xz
+<span class="nb">cd </span>iproute2-3.19.0
+
+sed <span class="nt">-i</span> <span class="s1">'/^TARGETS/s@arpd@@g'</span> misc/Makefile
+sed <span class="nt">-i</span> /ARPD/d Makefile
+sed <span class="nt">-i</span> <span class="s1">'s/arpd.8//'</span> man/man8/Makefile
+
+make
+make <span class="nv">DOCDIR</span><span class="o">=</span>/usr/share/doc/iproute2-3.19.0 install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> iproute2-3.19.0/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="kbd">Kbd</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 34 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf kbd-2.0.2.tar.gz
+<span class="nb">cd </span>kbd-2.0.2
+
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../kbd-2.0.2-backspace-1.patch
+sed <span class="nt">-i</span> <span class="s1">'s/\(RESIZECONS_PROGS=\)yes/\1no/g'</span> configure
+sed <span class="nt">-i</span> <span class="s1">'s/resizecons.8 //'</span> docs/man/man8/Makefile.in
+
+<span class="nv">PKG_CONFIG_PATH</span><span class="o">=</span>/tools/lib/pkgconfig ./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--disable-vlock</span>
+make
+make install
+
+mkdir <span class="nt">-v</span>       /usr/share/doc/kbd-2.0.2
+cp <span class="nt">-R</span> <span class="nt">-v</span> docs/doc/<span class="k">*</span> /usr/share/doc/kbd-2.0.2
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> kbd-2.0.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="kmod">Kmod</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 37 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf kmod-19.tar.xz
+<span class="nb">cd </span>kmod-19
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr          <span class="se">\</span>
+            <span class="nt">--bindir</span><span class="o">=</span>/bin          <span class="se">\</span>
+            <span class="nt">--sysconfdir</span><span class="o">=</span>/etc      <span class="se">\</span>
+            <span class="nt">--with-rootlibdir</span><span class="o">=</span>/lib <span class="se">\</span>
+            <span class="nt">--with-xz</span>              <span class="se">\</span>
+            <span class="nt">--with-zlib</span>
+make
+make install
+
+<span class="k">for </span>target <span class="k">in </span>depmod insmod lsmod modinfo modprobe rmmod<span class="p">;</span> <span class="k">do
+  </span>ln <span class="nt">-sv</span> ../bin/kmod /sbin/<span class="nv">$target</span>
+<span class="k">done
+
+</span>ln <span class="nt">-sv</span> kmod /bin/lsmod
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> kmod-19/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="libpipeline">Libpipeline</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 8.2 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf libpipeline-1.4.0.tar.gz
+<span class="nb">cd </span>libpipeline-1.4.0
+
+<span class="nv">PKG_CONFIG_PATH</span><span class="o">=</span>/tools/lib/pkgconfig ./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> libpipeline-1.4.0/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="make">Make</h4>
+<p>Derleme süresi: 0.6 SBU, Gerekli disk alanı: 14.2 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf make-4.1.tar.bz2
+<span class="nb">cd </span>make-4.1
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> make-4.1/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="patch">Patch</h4>
+<p>Derleme süresi: 0.2 SBU, Gerekli disk alanı: 11.6 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf patch-2.7.4.tar.xz
+<span class="nb">cd </span>patch-2.7.4
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> patch-2.7.4/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="sysklogd">Sysklogd</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 0.7 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf sysklogd-1.5.1.tar.gz
+<span class="nb">cd </span>sysklogd-1.5.1
+
+sed <span class="nt">-i</span> <span class="s1">'/Error loading kernel symbols/{n;n;d}'</span> ksym_mod.c
+make
+make <span class="nv">BINDIR</span><span class="o">=</span>/sbin install
+
+<span class="nb">cat</span> <span class="o">&gt;</span> /etc/syslog.conf &lt;&lt; <span class="s2">"EOF"</span>
+<span class="c"># Begin /etc/syslog.conf</span>
+
+auth,authpriv.<span class="k">*</span> -/var/log/auth.log
+<span class="k">*</span>.<span class="k">*</span><span class="p">;</span>auth,authpriv.none -/var/log/sys.log
+daemon.<span class="k">*</span> -/var/log/daemon.log
+kern.<span class="k">*</span> -/var/log/kern.log
+mail.<span class="k">*</span> -/var/log/mail.log
+user.<span class="k">*</span> -/var/log/user.log
+<span class="k">*</span>.emerg <span class="k">*</span>
+
+<span class="c"># End /etc/syslog.conf</span>
+EOF
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> sysklogd-1.5.1/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="sysvinit">Sysvinit</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 1.4 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf sysvinit-2.88dsf.tar.bz2
+<span class="nb">cd </span>sysvinit-2.88dsf
+
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../sysvinit-2.88dsf-consolidated-1.patch
+make <span class="nt">-C</span> src
+make <span class="nt">-C</span> src install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> sysvinit-2.88dsf/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="tar">Tar</h4>
+<p>Derleme süresi: 2.3 SBU, Gerekli disk alanı: 46 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf tar-1.28.tar.xz
+<span class="nb">cd </span>tar-1.28
+
+<span class="nv">FORCE_UNSAFE_CONFIGURE</span><span class="o">=</span>1  <span class="se">\</span>
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="se">\</span>
+            <span class="nt">--bindir</span><span class="o">=</span>/bin
+make
+make install
+make <span class="nt">-C</span> doc install-html <span class="nv">docdir</span><span class="o">=</span>/usr/share/doc/tar-1.28
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> tar-1.28/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="textinfo">Textinfo</h4>
+<p>Derleme süresi: 0.5 SBU, Gerekli disk alanı: 109 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf texinfo-5.2.tar.xz
+<span class="nb">cd </span>texinfo-5.2
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+make <span class="nv">TEXMF</span><span class="o">=</span>/usr/share/texmf install-tex
+
+<span class="nb">pushd</span> /usr/share/info
+rm <span class="nt">-v</span> dir
+<span class="k">for </span>f <span class="k">in</span> <span class="k">*</span>
+  <span class="k">do </span>install-info <span class="nv">$f</span> dir 2&gt;/dev/null
+<span class="k">done
+</span><span class="nb">popd
+
+cd</span> /sources
+rm <span class="nt">-rf</span> texinfo-5.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="eudev">Eudev</h4>
+<p>Derleme süresi: 0.2 SBU, Gerekli disk alanı: 95 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf eudev-2.1.1.tar.gz
+<span class="nb">cd </span>eudev-2.1.1
+
+sed <span class="nt">-r</span> <span class="nt">-i</span> <span class="s1">'s|/usr(/bin/test)|\1|'</span> <span class="nb">test</span>/udev-test.pl
+<span class="nv">BLKID_CFLAGS</span><span class="o">=</span><span class="nt">-I</span>/tools/include       <span class="se">\</span>
+<span class="nv">BLKID_LIBS</span><span class="o">=</span><span class="s1">'-L/tools/lib -lblkid'</span>   <span class="se">\</span>
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr           <span class="se">\</span>
+            <span class="nt">--bindir</span><span class="o">=</span>/sbin          <span class="se">\</span>
+            <span class="nt">--sbindir</span><span class="o">=</span>/sbin         <span class="se">\</span>
+            <span class="nt">--libdir</span><span class="o">=</span>/usr/lib       <span class="se">\</span>
+            <span class="nt">--sysconfdir</span><span class="o">=</span>/etc       <span class="se">\</span>
+            <span class="nt">--libexecdir</span><span class="o">=</span>/lib       <span class="se">\</span>
+            <span class="nt">--with-rootprefix</span><span class="o">=</span>      <span class="se">\</span>
+            <span class="nt">--with-rootlibdir</span><span class="o">=</span>/lib  <span class="se">\</span>
+            <span class="nt">--enable-split-usr</span>      <span class="se">\</span>
+            <span class="nt">--enable-libkmod</span>        <span class="se">\</span>
+            <span class="nt">--enable-rule_generator</span> <span class="se">\</span>
+            <span class="nt">--enable-keymap</span>         <span class="se">\</span>
+            <span class="nt">--disable-introspection</span> <span class="se">\</span>
+            <span class="nt">--disable-gudev</span>         <span class="se">\</span>
+            <span class="nt">--disable-gtk-doc-html</span>
+
+make
+mkdir <span class="nt">-pv</span> /lib/udev/rules.d
+mkdir <span class="nt">-pv</span> /etc/udev/rules.d
+make install
+<span class="nb">tar</span> <span class="nt">-xvf</span> ../eudev-2.1.1-manpages.tar.bz2 <span class="nt">-C</span> /usr/share
+<span class="nb">tar</span> <span class="nt">-xvf</span> ../udev-lfs-20140408.tar.bz2
+make <span class="nt">-f</span> udev-lfs-20140408/Makefile.lfs install
+
+udevadm hwdb <span class="nt">--update</span>
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> eudev-2.1.1/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="util-linux">Util-linux</h4>
+<p>Derleme süresi: 1.3 SBU, Gerekli disk alanı: 137 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf util-linux-2.26.tar.xz
+<span class="nb">cd </span>util-linux-2.26
+
+mkdir <span class="nt">-pv</span> /var/lib/hwclock
+./configure <span class="nv">ADJTIME_PATH</span><span class="o">=</span>/var/lib/hwclock/adjtime     <span class="se">\</span>
+            <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/util-linux-2.26 <span class="se">\</span>
+            <span class="nt">--disable-chfn-chsh</span>  <span class="se">\</span>
+            <span class="nt">--disable-login</span>      <span class="se">\</span>
+            <span class="nt">--disable-nologin</span>    <span class="se">\</span>
+            <span class="nt">--disable-su</span>         <span class="se">\</span>
+            <span class="nt">--disable-setpriv</span>    <span class="se">\</span>
+            <span class="nt">--disable-runuser</span>    <span class="se">\</span>
+            <span class="nt">--disable-pylibmount</span> <span class="se">\</span>
+            <span class="nt">--without-python</span>     <span class="se">\</span>
+            <span class="nt">--without-systemd</span>    <span class="se">\</span>
+            <span class="nt">--without-systemdsystemunitdir</span>
+make
+
+chown <span class="nt">-Rv</span> nobody <span class="nb">.</span>
+su nobody <span class="nt">-s</span> /bin/bash <span class="nt">-c</span> <span class="s2">"PATH=</span><span class="nv">$PATH</span><span class="s2"> make -k check"</span>
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> util-linux-2.26/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="man-db">Man-DB</h4>
+<p>Derleme süresi: 0.4 SBU, Gerekli disk alanı: 33 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf man-db-2.7.1.tar.xz
+<span class="nb">cd </span>man-db-2.7.1
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr                          <span class="se">\</span>
+            <span class="nt">--docdir</span><span class="o">=</span>/usr/share/doc/man-db-2.7.1   <span class="se">\</span>
+            <span class="nt">--sysconfdir</span><span class="o">=</span>/etc                      <span class="se">\</span>
+            <span class="nt">--disable-setuid</span>                       <span class="se">\</span>
+            <span class="nt">--with-browser</span><span class="o">=</span>/usr/bin/lynx           <span class="se">\</span>
+            <span class="nt">--with-vgrind</span><span class="o">=</span>/usr/bin/vgrind          <span class="se">\</span>
+            <span class="nt">--with-grap</span><span class="o">=</span>/usr/bin/grap
+make
+make install
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> man-db-2.7.1/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="vim">Vim</h4>
+<p>Derleme süresi: 1 SBU, Gerekli disk alanı: 139 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources  
+<span class="nb">tar </span>xvf vim-7.4.tar.bz2
+<span class="nb">cd </span>vim74
+
+<span class="nb">echo</span> <span class="s1">'#define SYS_VIMRC_FILE "/etc/vimrc"'</span> <span class="o">&gt;&gt;</span> src/feature.h
+./configure <span class="nt">--prefix</span><span class="o">=</span>/usr
+make
+make install
+
+ln <span class="nt">-sv</span> vim /usr/bin/vi
+<span class="k">for </span>L <span class="k">in</span>  /usr/share/man/<span class="o">{</span>,<span class="k">*</span>/<span class="o">}</span>man1/vim.1<span class="p">;</span> <span class="k">do
+    </span>ln <span class="nt">-sv</span> vim.1 <span class="k">$(</span>dirname <span class="nv">$L</span><span class="k">)</span>/vi.1
+<span class="k">done
+</span>ln <span class="nt">-sv</span> ../vim/vim74/doc /usr/share/doc/vim-7.4
+
+<span class="nb">cat</span> <span class="o">&gt;</span> /etc/vimrc &lt;&lt; <span class="s2">"EOF"</span>
+<span class="s2">" Begin /etc/vimrc
+
+set nocompatible
+set backspace=2
+syntax on
+if (&amp;term == "</span>iterm<span class="s2">") || (&amp;term == "</span>putty<span class="s2">")
+  set background=dark
+endif
+
+"</span> End /etc/vimrc
+EOF
+
+<span class="c"># vim ayarları için:</span>
+vim <span class="nt">-c</span> <span class="s1">':options'</span>
+<span class="c"># çıkmayı bilmeyenler ":q" yazacaklar</span>
+
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> vim74/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h2 id="temizlik">Temizlik</h2>
+<p>Evet neredeyse tüm derleme işlerimizi bitirdik. Geriye sistem ayarlarını düzenlemek, <em>boot</em> ayarlarını yapmak ve <strong>çekirdek(kernel)</strong> derlemek kaldı. Geleceği çok düşünmeden temizliğimizi bitirelim.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre></td><td class="code"><pre><span class="nb">logout</span>
+<span class="c"># paralel linuxumuzdan çıktık</span>
+
+chroot <span class="nv">$LFS</span> /tools/bin/env <span class="nt">-i</span>            <span class="se">\</span>
+    <span class="nv">HOME</span><span class="o">=</span>/root <span class="nv">TERM</span><span class="o">=</span><span class="nv">$TERM</span> <span class="nv">PS1</span><span class="o">=</span><span class="s1">'\u:\w\$ '</span> <span class="se">\</span>
+    <span class="nv">PATH</span><span class="o">=</span>/bin:/usr/bin:/sbin:/usr/sbin   <span class="se">\</span>
+    /tools/bin/bash <span class="nt">--login</span>
+<span class="c"># yeniden girdik</span>
+
+/tools/bin/find /<span class="o">{</span>,usr/<span class="o">}{</span>bin,lib,sbin<span class="o">}</span> <span class="nt">-type</span> f <span class="se">\</span>
+    <span class="nt">-exec</span> /tools/bin/strip <span class="nt">--strip-debug</span> <span class="s1">'{}'</span> <span class="s1">';'</span>
+<span class="c"># ilk temizliğimizi yaptık</span>
+<span class="c"># "File format not recognized" yazısı önemsizdir. Endişelenmeyin.</span>
+rm <span class="nt">-rf</span> /tmp/<span class="k">*</span>
+<span class="c"># ikinciyi de yaptık</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Burada önemli bir şey var dikkat edin. Artık tekrar giriş yapacağımız zaman  <strong>eski chroot komutlarını kullanmayacağız.</strong> Kitap yenisini veriyor. Bu sıkıcı bölümler başarıyla bittiğine göre kutlama yapabilirsiniz.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="code"><pre>chroot <span class="s2">"</span><span class="nv">$LFS</span><span class="s2">"</span> /usr/bin/env <span class="nt">-i</span>              <span class="se">\</span>
+    <span class="nv">HOME</span><span class="o">=</span>/root <span class="nv">TERM</span><span class="o">=</span><span class="s2">"</span><span class="nv">$TERM</span><span class="s2">"</span> <span class="nv">PS1</span><span class="o">=</span><span class="s1">'\u:\w\$ '</span> <span class="se">\</span>
+    <span class="nv">PATH</span><span class="o">=</span>/bin:/usr/bin:/sbin:/usr/sbin     <span class="se">\</span>
+    /bin/bash <span class="nt">--login</span></pre></td></tr></tbody></table></code></pre></figure>
+
+</article>
+<div class="col-sm-12">
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {this.page.url = 'https://www.ozanselte.com/lfs-4-yeni-sistemi-derleme/';};
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://ozanselte.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div></div>
+<footer class="container mb-3">
+<div class="row">
+<div class="col text-center"><a class="nav-link" href="https://github.com/ozanselte"><i class="fab fa-github fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.facebook.com/ozanselte"><i class="fab fa-facebook fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://twitter.com/ozanselte"><i class="fab fa-twitter fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.instagram.com/ozanselte"><i class="fab fa-instagram fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.linkedin.com/in/ozanselte"><i class="fab fa-linkedin fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://t.me/ozanselte"><i class="fab fa-telegram fa-lg"></i> ozanselte</a></div>
+</div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '');
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+</body>
+</html>

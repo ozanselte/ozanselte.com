@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="">
+<link rel='icon' type='image/x-icon' href='/images/site/favicon.ico'>
+<title>LFS 3 - Yeni Sistemi Düzenleme</title>
+<meta name="description" content="Geçen yazıda sistemimizi kurmuştuk. Şimdi sıra o sistemin içinde yaşamaya geldi. Umarım okuyanların çoğu chroot komutunu biliyordur. Belirtilen klasörü siste...">
+<link rel="canonical" href="https://www.ozanselte.com//lfs-3-yeni-sistemi-duzenleme/">
+<meta name="keywords" content=", , , , ">
+<meta name="referrer" content="origin">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link href="/assets/css/style.css" rel="stylesheet">
+<style>
+header {
+background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.25)), url("/images/post_covers/computer_glasses.jpg") no-repeat scroll center center / cover;
+}
+</style>
+</head>
+<body>
+<header class="container-fluid">
+<nav class="navbar navbar-expand-md navbar-dark">
+<div class="container">
+<a class="navbar-brand" href="/">Ozan Şelte</a>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ml-auto">
+
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" href="#" id="navbarDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Kategoriler</a>
+<div class="dropdown-menu" aria-labelledby="navbarDrop">
+<a class="dropdown-item" href="/programlama">Programlama</a><a class="dropdown-item" href="/genel">Genel</a><a class="dropdown-item" href="/linux">Linux</a><a class="dropdown-item" href="/c-ve-c++">C ve C++</a><a class="dropdown-item" href="/oyun-programlama">Oyun Programlama</a>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+<div class="text-center">
+<a href="/" title=""><img class="rounded mx-auto d-block" alt="" src="/images/site/ozanselte.png"></a><h1><a href="/" title="">Ozan Şelte</a><br><small>Mühendis Adayı</small></h1>
+</div>
+</header>
+<br>
+<div class="container"><div class="row">
+<article class="col-sm-12 text-justify">
+<h1>LFS 3 - Yeni Sistemi Düzenleme<br><small>14 Ağustos 2015 - 
+<a href="/linux"><strong class="d-inline-block mb-2 mr-3" style="color: var(--purple);">Linux</strong></a></small></h1>
+<p>Geçen yazıda sistemimizi kurmuştuk. Şimdi sıra o sistemin içinde yaşamaya geldi. Umarım okuyanların çoğu <em>chroot</em> komutunu biliyordur. Belirtilen klasörü sistemin kök klasörü olarak kabul eder ve oraya login olur. Biz de kendi sistemimizin içindeki bir klasörde, başka bir paralel sistemde yaşarız.
+Hemen o yeni sisteme geçmek için gerekli işleri bitirelim. Öncelik <em>$LFS</em> klasörümüzü <em>mount</em> edelim ve <em>root</em> olarak bekleyelim.</p>
+
+<h3 id="sanal-çekirdek-klasörleri">Sanal çekirdek klasörleri</h3>
+<p>Eğer sistemi kurmaya ara verirseniz ya da bir sorun olur da bilgisayarı yeniden başlatırsanız bu bölümü baştan girmelisiniz.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre></td><td class="code"><pre>mkdir <span class="nt">-pv</span> <span class="nv">$LFS</span>/<span class="o">{</span>dev,proc,sys,run<span class="o">}</span>
+
+mknod <span class="nt">-m</span> 600 <span class="nv">$LFS</span>/dev/console c 5 1
+mknod <span class="nt">-m</span> 666 <span class="nv">$LFS</span>/dev/null c 1 3
+
+mount <span class="nt">-v</span> <span class="nt">--bind</span> /dev <span class="nv">$LFS</span>/dev
+
+mount <span class="nt">-vt</span> devpts devpts <span class="nv">$LFS</span>/dev/pts <span class="nt">-o</span> <span class="nv">gid</span><span class="o">=</span>5,mode<span class="o">=</span>620
+mount <span class="nt">-vt</span> proc proc <span class="nv">$LFS</span>/proc
+mount <span class="nt">-vt</span> sysfs sysfs <span class="nv">$LFS</span>/sys
+mount <span class="nt">-vt</span> tmpfs tmpfs <span class="nv">$LFS</span>/run
+
+<span class="k">if</span> <span class="o">[</span> <span class="nt">-h</span> <span class="nv">$LFS</span>/dev/shm <span class="o">]</span><span class="p">;</span> <span class="k">then
+  </span>mkdir <span class="nt">-pv</span> <span class="nv">$LFS</span>/<span class="k">$(</span>readlink <span class="nv">$LFS</span>/dev/shm<span class="k">)</span>
+<span class="k">fi</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h3 id="sisteme-düşmek">Sisteme düşmek</h3>
+<p>Bu komutla birlikte LFS sistemimizin içine giriyoruz. Paralel Linux’a hoşgeldiniz. Tekrar edeyim bir şeye ara verirseniz üstteki komutlar sonrası bunu da girerek yine sisteme gireceksiniz.
+Neymiş? Sisteme girmek için önce yukarıdakiler sonra bu.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="code"><pre>chroot <span class="s2">"</span><span class="nv">$LFS</span><span class="s2">"</span> /tools/bin/env <span class="nt">-i</span> <span class="se">\</span>
+    <span class="nv">HOME</span><span class="o">=</span>/root                  <span class="se">\</span>
+    <span class="nv">TERM</span><span class="o">=</span><span class="s2">"</span><span class="nv">$TERM</span><span class="s2">"</span>                <span class="se">\</span>
+    <span class="nv">PS1</span><span class="o">=</span><span class="s1">'\u:\w\$ '</span>              <span class="se">\</span>
+    <span class="nv">PATH</span><span class="o">=</span>/bin:/usr/bin:/sbin:/usr/sbin:/tools/bin <span class="se">\</span>
+    /tools/bin/bash <span class="nt">--login</span> +h</pre></td></tr></tbody></table></code></pre></figure>
+
+<h3 id="klasörleri-yaratmak">Klasörleri yaratmak</h3>
+<p>Artık sistemin içindeyiz ve terminalinizde <strong>I have no name!:/#</strong> yazıyor. Çünkü henüz <em>/etc/passwd</em> dosyamızı oluşturmadık.</p>
+<blockquote>
+  <p>Yeni LFS sisteminde <em>/etc/passwd = /tools/etc/passwd</em> birincil sistemde. Bunu da biliyorsanız sorunumuz yok.</p>
+</blockquote>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre></td><td class="code"><pre>mkdir <span class="nt">-pv</span> /<span class="o">{</span>bin,boot,etc/<span class="o">{</span>opt,sysconfig<span class="o">}</span>,home,lib/firmware,mnt,opt<span class="o">}</span>
+mkdir <span class="nt">-pv</span> /<span class="o">{</span>media/<span class="o">{</span>floppy,cdrom<span class="o">}</span>,sbin,srv,var<span class="o">}</span>
+install <span class="nt">-dv</span> <span class="nt">-m</span> 0750 /root
+install <span class="nt">-dv</span> <span class="nt">-m</span> 1777 /tmp /var/tmp
+mkdir <span class="nt">-pv</span> /usr/<span class="o">{</span>,local/<span class="o">}{</span>bin,include,lib,sbin,src<span class="o">}</span>
+mkdir <span class="nt">-pv</span> /usr/<span class="o">{</span>,local/<span class="o">}</span>share/<span class="o">{</span>color,dict,doc,info,locale,man<span class="o">}</span>
+mkdir <span class="nt">-v</span>  /usr/<span class="o">{</span>,local/<span class="o">}</span>share/<span class="o">{</span>misc,terminfo,zoneinfo<span class="o">}</span>
+mkdir <span class="nt">-v</span>  /usr/libexec
+mkdir <span class="nt">-pv</span> /usr/<span class="o">{</span>,local/<span class="o">}</span>share/man/man<span class="o">{</span>1..8<span class="o">}</span>
+
+<span class="c"># 64bit ise yazılacaklar başlangıcı</span>
+ln <span class="nt">-sv</span> lib /lib64
+ln <span class="nt">-sv</span> lib /usr/lib64
+ln <span class="nt">-sv</span> lib /usr/local/lib64
+<span class="c"># 64bit ise yazılacaklar sonu</span>
+
+mkdir <span class="nt">-v</span> /var/<span class="o">{</span>log,mail,spool<span class="o">}</span>
+ln <span class="nt">-sv</span> /run /var/run
+ln <span class="nt">-sv</span> /run/lock /var/lock
+mkdir <span class="nt">-pv</span> /var/<span class="o">{</span>opt,cache,lib/<span class="o">{</span>color,misc,locate<span class="o">}</span>,local<span class="o">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h3 id="temel-dosyaları-ve-köprüleri-oluşturmak">Temel dosyaları ve köprüleri oluşturmak</h3>
+<p>Bu bölümde önemli dosyaların kısayollarını oluşturacak ve en önemli dosyalardan ikisi olan <em>/etc/{passwd, group}</em> dosyalarını yaratacağız.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+</pre></td><td class="code"><pre>ln <span class="nt">-sv</span> /tools/bin/<span class="o">{</span>bash,cat,echo,pwd,stty<span class="o">}</span> /bin
+ln <span class="nt">-sv</span> /tools/bin/perl /usr/bin
+ln <span class="nt">-sv</span> /tools/lib/libgcc_s.so<span class="o">{</span>,.1<span class="o">}</span> /usr/lib
+ln <span class="nt">-sv</span> /tools/lib/libstdc++.so<span class="o">{</span>,.6<span class="o">}</span> /usr/lib
+sed <span class="s1">'s/tools/usr/'</span> /tools/lib/libstdc++.la <span class="o">&gt;</span> /usr/lib/libstdc++.la
+ln <span class="nt">-sv</span> bash /bin/sh
+
+ln <span class="nt">-sv</span> /proc/self/mounts /etc/mtab
+
+<span class="nb">cat</span> <span class="o">&gt;</span> /etc/passwd &lt;&lt; <span class="s2">"EOF"</span>
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/dev/null:/bin/false
+daemon:x:6:6:Daemon User:/dev/null:/bin/false
+messagebus:x:18:18:D-Bus Message Daemon User:/var/run/dbus:/bin/false
+nobody:x:99:99:Unprivileged User:/dev/null:/bin/false
+EOF
+
+<span class="nb">cat</span> <span class="o">&gt;</span> /etc/group &lt;&lt; <span class="s2">"EOF"</span>
+root:x:0:
+bin:x:1:daemon
+sys:x:2:
+kmem:x:3:
+tape:x:4:
+tty:x:5:
+daemon:x:6:
+floppy:x:7:
+disk:x:8:
+lp:x:9:
+dialout:x:10:
+audio:x:11:
+video:x:12:
+utmp:x:13:
+usb:x:14:
+cdrom:x:15:
+adm:x:16:
+messagebus:x:18:
+systemd-journal:x:23:
+input:x:24:
+mail:x:34:
+nogroup:x:99:
+users:x:999:
+EOF
+
+<span class="nb">exec</span> /tools/bin/bash <span class="nt">--login</span> +h</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Artık adımız <em>root</em> oldu. Bu doğru yolda olduğumuzun işareti. Kim <em>root</em> olmak istemez ki?</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="code"><pre>touch /var/log/<span class="o">{</span>btmp,lastlog,wtmp<span class="o">}</span>
+chgrp <span class="nt">-v</span> utmp /var/log/lastlog
+chmod <span class="nt">-v</span> 664  /var/log/lastlog
+chmod <span class="nt">-v</span> 600  /var/log/btmp</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Sıra tekrar derlemelere geldi. Eski <em>$LFS/sources</em> klasörünüzü <em>/sources</em> yolunda bulabilirsiniz. Sıradaki yazımızda sistemimizin içini derleyeceğiz.</p>
+
+</article>
+<div class="col-sm-12">
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {this.page.url = 'https://www.ozanselte.com/lfs-3-yeni-sistemi-duzenleme/';};
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://ozanselte.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div></div>
+<footer class="container mb-3">
+<div class="row">
+<div class="col text-center"><a class="nav-link" href="https://github.com/ozanselte"><i class="fab fa-github fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.facebook.com/ozanselte"><i class="fab fa-facebook fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://twitter.com/ozanselte"><i class="fab fa-twitter fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.instagram.com/ozanselte"><i class="fab fa-instagram fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.linkedin.com/in/ozanselte"><i class="fab fa-linkedin fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://t.me/ozanselte"><i class="fab fa-telegram fa-lg"></i> ozanselte</a></div>
+</div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '');
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+</body>
+</html>

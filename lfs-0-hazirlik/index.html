@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="">
+<link rel='icon' type='image/x-icon' href='/images/site/favicon.ico'>
+<title>LFS 0 - Hazırlık</title>
+<meta name="description" content="İki-üç yıl önce lisenin ilk yılında ilk başarılı Linux From Scratch denememi gerçekleştirmiştim. Diyeceksiniz ki öncekiler başarısız mıydı? Değillerdi, ben k...">
+<link rel="canonical" href="https://www.ozanselte.com//lfs-0-hazirlik/">
+<meta name="keywords" content=", , , , ">
+<meta name="referrer" content="origin">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link href="/assets/css/style.css" rel="stylesheet">
+<style>
+header {
+background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.25)), url("/images/post_covers/green_text.jpg") no-repeat scroll center center / cover;
+}
+</style>
+</head>
+<body>
+<header class="container-fluid">
+<nav class="navbar navbar-expand-md navbar-dark">
+<div class="container">
+<a class="navbar-brand" href="/">Ozan Şelte</a>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ml-auto">
+
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" href="#" id="navbarDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Kategoriler</a>
+<div class="dropdown-menu" aria-labelledby="navbarDrop">
+<a class="dropdown-item" href="/programlama">Programlama</a><a class="dropdown-item" href="/genel">Genel</a><a class="dropdown-item" href="/linux">Linux</a><a class="dropdown-item" href="/c-ve-c++">C ve C++</a><a class="dropdown-item" href="/oyun-programlama">Oyun Programlama</a>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+<div class="text-center">
+<a href="/" title=""><img class="rounded mx-auto d-block" alt="" src="/images/site/ozanselte.png"></a><h1><a href="/" title="">Ozan Şelte</a><br><small>Mühendis Adayı</small></h1>
+</div>
+</header>
+<br>
+<div class="container"><div class="row">
+<article class="col-sm-12 text-justify">
+<h1>LFS 0 - Hazırlık<br><small>7 Ağustos 2015 - 
+<a href="/linux"><strong class="d-inline-block mb-2 mr-3" style="color: var(--purple);">Linux</strong></a></small></h1>
+<p>İki-üç yıl önce lisenin ilk yılında ilk başarılı <strong>Linux From Scratch</strong> denememi gerçekleştirmiştim. Diyeceksiniz ki öncekiler başarısız mıydı? Değillerdi, ben kitabı açıp uzunluğunu görünce üşeniyordum. Tabii ki bu da bir başarısızlık fakat <em>sayılmaz.</em></p>
+
+<h2 id="linux-from-scratch-yani-lfs-nedir">Linux From Scratch yani LFS nedir?</h2>
+<p>Sıfırdan linux sistemi inşa etme kitabıdır. Her hangi bir sistem üzerinde tek tek tüm paketleri yokluğa <strong>derler</strong> sonra onları boot ederiz. Bir bakmışız kendi linux’umuzu yapmışız.
+LFS çok zevklidir. Ne kadar uzun soluklu, işlemcinize göre hızlı ya da genelde yavaş olsa da bitince BENİM DAĞITIMIIIIM diye bilgisayarınıza yerine göre diskinize sarılıp uyuyabilirsiniz.</p>
+
+<h3 id="neden-uğraşalım">Neden uğraşalım?</h3>
+<p>Cidden önemli bir sorudur bu. Çoğu zaman paket kurmak bile canımızı sıkarken biz onları derlemeyi planlıyoruz. Gerek kendi GNU/Linux dağıtımızı oluşturmak gerek linux sisteminin inceliklerini öğrenmek yeterli sebeplerdir kanımca. Hem hava da atabilirsiniz.</p>
+
+<h2 id="başlıyoruz">Başlıyoruz</h2>
+<p>Önce kaynağımızı verelim. <a href="http://www.linuxfromscratch.org/lfs/view/stable/index.html">Linux From Scratch</a>
+Ben yazıyı yazaker son sürüm <strong>Version 7.7</strong> olduğu için bu versiyon üzerinen gideceğim. Belki kernel kurarken bir çakallık yaparak 4.2 kurarız.</p>
+
+<h3 id="sistem-gereksinimleri">Sistem Gereksinimleri</h3>
+<ul>
+  <li><strong>Öncelikle bir Linux dağıtımı mümkünse güncel olsun.</strong></li>
+  <li>Bash-3.2</li>
+  <li>Binutils-2.17</li>
+  <li>Bison-2.3</li>
+  <li>Bzip2-1.0.4</li>
+  <li>Cureutils-6.9</li>
+  <li>Diffutils-2.8.1</li>
+  <li>Findutils-4.2.31</li>
+  <li>Gawk-4.0.1</li>
+  <li>GCC-4.1.2</li>
+  <li>Glibc-2.5.1</li>
+  <li>Grep-2.5.1a</li>
+  <li>Gzip-1.3.12</li>
+  <li>Linux Kernel-2.6.32</li>
+  <li>M4-1.4.10</li>
+  <li>Make-3.81</li>
+  <li>Patch-2.5.4</li>
+  <li>Perl-5.8.8</li>
+  <li>Sed-4.1.5</li>
+  <li>Tar-1.18</li>
+  <li>Texinfo-4.7</li>
+  <li>Xz-5.0.0</li>
+</ul>
+
+<p>Şimdi diyeceksiniz ki, tabii ki haklı olarak diyeceksiniz, ben bu kadar şeyi nasıl kontrol ederim? Tek tek uzun sürer. LFS’yi yazan abilerimiz bize <em>bash</em> scripti de yazmışlar. Alttaki kodu terminale yapıştırabilirsiniz.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+</pre></td><td class="code"><pre><span class="nb">cat</span> <span class="o">&gt;</span> version-check.sh &lt;&lt; <span class="s2">"EOF"</span>
+<span class="c">#!/bin/bash</span>
+<span class="c"># Simple script to list version numbers of critical development tools</span>
+
+<span class="nb">export </span><span class="nv">LC_ALL</span><span class="o">=</span>C
+bash <span class="nt">--version</span> | head <span class="nt">-n1</span> | cut <span class="nt">-d</span><span class="s2">" "</span> <span class="nt">-f2-4</span>
+<span class="nb">echo</span> <span class="s2">"/bin/sh -&gt; </span><span class="sb">`</span>readlink <span class="nt">-f</span> /bin/sh<span class="sb">`</span><span class="s2">"</span>
+<span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"Binutils: "</span><span class="p">;</span> ld <span class="nt">--version</span> | head <span class="nt">-n1</span> | cut <span class="nt">-d</span><span class="s2">" "</span> <span class="nt">-f3-</span>
+bison <span class="nt">--version</span> | head <span class="nt">-n1</span>
+
+<span class="k">if</span> <span class="o">[</span> <span class="nt">-h</span> /usr/bin/yacc <span class="o">]</span><span class="p">;</span> <span class="k">then
+  </span><span class="nb">echo</span> <span class="s2">"/usr/bin/yacc -&gt; </span><span class="sb">`</span>readlink <span class="nt">-f</span> /usr/bin/yacc<span class="sb">`</span><span class="s2">"</span><span class="p">;</span>
+<span class="k">elif</span> <span class="o">[</span> <span class="nt">-x</span> /usr/bin/yacc <span class="o">]</span><span class="p">;</span> <span class="k">then
+  </span><span class="nb">echo </span>yacc is <span class="sb">`</span>/usr/bin/yacc <span class="nt">--version</span> | head <span class="nt">-n1</span><span class="sb">`</span>
+<span class="k">else
+  </span><span class="nb">echo</span> <span class="s2">"yacc not found"</span> 
+<span class="k">fi
+
+</span>bzip2 <span class="nt">--version</span> 2&gt;&amp;1 &lt; /dev/null | head <span class="nt">-n1</span> | cut <span class="nt">-d</span><span class="s2">" "</span> <span class="nt">-f1</span>,6-
+<span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"Coreutils: "</span><span class="p">;</span> chown <span class="nt">--version</span> | head <span class="nt">-n1</span> | cut <span class="nt">-d</span><span class="s2">")"</span> <span class="nt">-f2</span>
+diff <span class="nt">--version</span> | head <span class="nt">-n1</span>
+find <span class="nt">--version</span> | head <span class="nt">-n1</span>
+gawk <span class="nt">--version</span> | head <span class="nt">-n1</span>
+
+<span class="k">if</span> <span class="o">[</span> <span class="nt">-h</span> /usr/bin/awk <span class="o">]</span><span class="p">;</span> <span class="k">then
+  </span><span class="nb">echo</span> <span class="s2">"/usr/bin/awk -&gt; </span><span class="sb">`</span>readlink <span class="nt">-f</span> /usr/bin/awk<span class="sb">`</span><span class="s2">"</span><span class="p">;</span>
+<span class="k">elif</span> <span class="o">[</span> <span class="nt">-x</span> /usr/bin/awk <span class="o">]</span><span class="p">;</span> <span class="k">then
+  </span><span class="nb">echo </span>yacc is <span class="sb">`</span>/usr/bin/awk <span class="nt">--version</span> | head <span class="nt">-n1</span><span class="sb">`</span>
+<span class="k">else 
+  </span><span class="nb">echo</span> <span class="s2">"awk not found"</span> 
+<span class="k">fi
+
+</span>gcc <span class="nt">--version</span> | head <span class="nt">-n1</span>
+g++ <span class="nt">--version</span> | head <span class="nt">-n1</span>
+ldd <span class="nt">--version</span> | head <span class="nt">-n1</span> | cut <span class="nt">-d</span><span class="s2">" "</span> <span class="nt">-f2-</span>  <span class="c"># glibc version</span>
+<span class="nb">grep</span> <span class="nt">--version</span> | head <span class="nt">-n1</span>
+gzip <span class="nt">--version</span> | head <span class="nt">-n1</span>
+<span class="nb">cat</span> /proc/version
+m4 <span class="nt">--version</span> | head <span class="nt">-n1</span>
+make <span class="nt">--version</span> | head <span class="nt">-n1</span>
+patch <span class="nt">--version</span> | head <span class="nt">-n1</span>
+<span class="nb">echo </span>Perl <span class="sb">`</span>perl <span class="nt">-V</span>:version<span class="sb">`</span>
+sed <span class="nt">--version</span> | head <span class="nt">-n1</span>
+<span class="nb">tar</span> <span class="nt">--version</span> | head <span class="nt">-n1</span>
+makeinfo <span class="nt">--version</span> | head <span class="nt">-n1</span>
+xz <span class="nt">--version</span> | head <span class="nt">-n1</span>
+
+<span class="nb">echo</span> <span class="s1">'main(){}'</span> <span class="o">&gt;</span> dummy.c <span class="o">&amp;&amp;</span> g++ <span class="nt">-o</span> dummy dummy.c
+<span class="k">if</span> <span class="o">[</span> <span class="nt">-x</span> dummy <span class="o">]</span>
+  <span class="k">then </span><span class="nb">echo</span> <span class="s2">"g++ compilation OK"</span><span class="p">;</span>
+  <span class="k">else </span><span class="nb">echo</span> <span class="s2">"g++ compilation failed"</span><span class="p">;</span> <span class="k">fi
+</span>rm <span class="nt">-f</span> dummy.c dummy
+EOF
+
+bash version-check.sh</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Zaman üşengeçlik zamanı değildir. Şimdi bir bir kontrol edin bakalım uymayan var mı? Varsa güncelleyin onu da anlatırsam yazı çok uzar. Zaten siz linux kullanıp LFS’ye gönül vermişsiniz, üşenmezsiniz.</p>
+
+<h3 id="disk-hazırlama">Disk Hazırlama</h3>
+<p>Şimdi burayı biraz kısa geçeceğim. Diskinizde yeni bir bölüm oluşturmanız gerekiyor. LFS yazarı gurularımız en az 4GB ayırmamızı istiyor. Tabi bu minimal sistem için. Ağ bağlantısı için bile yetmeyebilir. Ayırın işte kafanıza göre.</p>
+
+<p>/(root), /home, /boot vs. nasıl istiyorsanız, kaç tane istiyorsanız ayarlayın disk bölümlerini. Ben 32GB flashdiskime kuracağım. SWAP falan ayırmayı da düşünmüyorum. Gerekirse sonra ayarlarım. Siz zaten disk nasıl bölümlenir biliyorsunuz LFS yapıyorsunuz yani. Bilmelisiniz.
+Sonra bu bölümleri biçimlendiriyoruz. <em>mount</em> edeceğimiz yeri belirtiyoruz. Disk bölümlerimizi <em>mount</em> ediyoruz. Örnek:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="code"><pre>mkfs <span class="nt">-v</span> <span class="nt">-t</span> ext4 /dev/sdXX <span class="c">#ext4 biçimlendirme</span>
+mkswap /dev/sdYY <span class="c">#swap biçimlendirme</span>
+mkdir <span class="nt">-pv</span> /mnt/lfs <span class="c">#LFS klasörü oluşturma</span>
+<span class="nb">export </span><span class="nv">LFS</span><span class="o">=</span>/mnt/lfs <span class="c">#Klasörü belirtme</span>
+
+mount <span class="nt">-v</span> <span class="nt">-t</span> ext4 /dev/sdXX <span class="nv">$LFS</span> <span class="c">#mount etme</span>
+/sbin/swapon <span class="nt">-v</span> /dev/sdYY</pre></td></tr></tbody></table></code></pre></figure>
+
+<blockquote>
+  <p>Tavsiyem, ki bu gurularımızın da tavsiyesidir, <em>.bash_profile</em> dosyanıza <em>$LFS</em> değişkenini ekleyin.</p>
+</blockquote>
+
+</article>
+<div class="col-sm-12">
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {this.page.url = 'https://www.ozanselte.com/lfs-0-hazirlik/';};
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://ozanselte.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div></div>
+<footer class="container mb-3">
+<div class="row">
+<div class="col text-center"><a class="nav-link" href="https://github.com/ozanselte"><i class="fab fa-github fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.facebook.com/ozanselte"><i class="fab fa-facebook fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://twitter.com/ozanselte"><i class="fab fa-twitter fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.instagram.com/ozanselte"><i class="fab fa-instagram fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.linkedin.com/in/ozanselte"><i class="fab fa-linkedin fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://t.me/ozanselte"><i class="fab fa-telegram fa-lg"></i> ozanselte</a></div>
+</div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '');
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+</body>
+</html>

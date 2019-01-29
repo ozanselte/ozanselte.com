@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="">
+<link rel='icon' type='image/x-icon' href='/images/site/favicon.ico'>
+<title>C ile Soket Programlama Rehberi</title>
+<meta name="description" content="Bu yazıda hem temel hem de orta düzeyde soket programlamayı göstereceğim. Baştan belirteyim winsock kullanmayacağım. Çünkü Windows kullanmıyorum ve taşınabil...">
+<link rel="canonical" href="https://www.ozanselte.com//c-ile-soket-programlama-rehberi/">
+<meta name="keywords" content=", , , , , ">
+<meta name="referrer" content="origin">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link href="/assets/css/style.css" rel="stylesheet">
+<style>
+header {
+background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.25)), url("/images/post_covers/world_network.jpg") no-repeat scroll center center / cover;
+}
+</style>
+</head>
+<body>
+<header class="container-fluid">
+<nav class="navbar navbar-expand-md navbar-dark">
+<div class="container">
+<a class="navbar-brand" href="/">Ozan Şelte</a>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ml-auto">
+
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" href="#" id="navbarDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Kategoriler</a>
+<div class="dropdown-menu" aria-labelledby="navbarDrop">
+<a class="dropdown-item" href="/programlama">Programlama</a><a class="dropdown-item" href="/genel">Genel</a><a class="dropdown-item" href="/linux">Linux</a><a class="dropdown-item" href="/c-ve-c++">C ve C++</a><a class="dropdown-item" href="/oyun-programlama">Oyun Programlama</a>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+<div class="text-center">
+<a href="/" title=""><img class="rounded mx-auto d-block" alt="" src="/images/site/ozanselte.png"></a><h1><a href="/" title="">Ozan Şelte</a><br><small>Mühendis Adayı</small></h1>
+</div>
+</header>
+<br>
+<div class="container"><div class="row">
+<article class="col-sm-12 text-justify">
+<h1>C ile Soket Programlama Rehberi<br><small>7 Eylül 2015 - 
+<a href="/programlama"><strong class="d-inline-block mb-2 mr-3" style="color: var(--blue);">Programlama</strong></a><a href="/c-ve-c++"><strong class="d-inline-block mb-2 mr-3" style="color: var(--pink);">C ve C++</strong></a></small></h1>
+<p>Bu yazıda hem temel hem de orta düzeyde soket programlamayı göstereceğim. Baştan belirteyim <strong>winsock</strong> kullanmayacağım. Çünkü <strong>Windows</strong> kullanmıyorum ve taşınabilirlik birçok şeyden önemli.</p>
+
+<blockquote>
+  <p>Malzeme listesi:</p>
+</blockquote>
+
+<blockquote>
+  <ul>
+    <li>Bilgisayar(mümkünse Linux ya da Unix kurulu)</li>
+    <li><strong>gcc</strong>[GNU(Gnu’s Not Unix) C Compiler]</li>
+    <li>Editör(Notepad, vim, nano, Sublime Text &lt;3)</li>
+    <li>Siz</li>
+  </ul>
+</blockquote>
+
+<h2 id="soket-türleri">Soket türleri</h2>
+<p>Burada kendi kullandığım iki soket türünü anlatacağım. <em>SOCK_DGRAM</em> ve <em>SOCK_STREAM</em>. Bilinen isimleriyle sırasıyla UDP ve TCP.</p>
+
+<h4 id="sock_dgram---udp">SOCK_DGRAM - UDP</h4>
+<p><em>Kullanıcı Veri Paketi Protokokü - User Datagram Protocol - <a href="https://www.rfc-editor.org/rfc/rfc768.txt">RFC 768</a></em><br />
+UDP protokolünde üçlü el sıkışma uygulanmaz, dolayısıyla bağlantı gerekmez. Sadece bir uçtan diğer uca veri gönderilir. Verinin hangi sırada gideceği ya da gideceği garanti edilmez. Öylece gönderilir. TCP’ye göre biraz daha hızlıdır. Avantajı bağlantının açık kalması gibi bir zorunluluğun bulunmamasıdır.</p>
+
+<h4 id="sock_stream---tcp">SOCK_STREAM - TCP</h4>
+<p><em>Aktarım Denetim Protokolü - Transmission Control Protocol - <a href="https://www.rfc-editor.org/rfc/rfc793.txt">RFC 793</a></em><br />
+Bu protokolde üçlü el sıkışma uygulanır. Sırasıyla:</p>
+
+<ul>
+  <li>İstemci » SYN »&gt; Sunucu</li>
+  <li>İstemci « SYN+ACK « Sunucu</li>
+  <li>İstemci » ACK « Sunucu</li>
+</ul>
+
+<p>yolu izlenerek bağlantı sağlanır. Gönderilen veriler doğru sırada karşıya iletilir. Protokol hatalara karşı korumalı olduğundan görülebilecek hatalarda sorumlu siz olursunuz.</p>
+
+<h5 id="anlatılmayacaklar">Anlatılmayacaklar</h5>
+<p><em>SOCK_RAW</em> - <em>SOCK_RDM</em> - <em>SOCK_SEQPACKET</em> - <em>SOCK_PACKET</em></p>
+
+<h5 id="bilinmesi-gerekenler">Bilinmesi gerekenler</h5>
+<p><strong>errno.h</strong>, burada belirtilen fonksiyonların bulunduğu dosya.<br />
+<strong>int errno</strong>, hata durumunda <em>-1</em> döndüren fonksiyonların hatalarının, ne olduklarını belirten bir değişkendir.<br />
+<strong>char * strerror ( int errnum )</strong> , <em>errno</em> değerine göre hatanın açıklamasını döndüren fonksiyon.<br />
+<strong>void perror ( const char * str )</strong> , aşağıdaki iki kodun aynı anlama geldiğini söylersem hemen anlaşılır. Kısaca mesajın sonuna <em>”: “</em> ve hata açıklaması ekleyerek ekrana basar.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="code"><pre><span class="n">printf</span><span class="p">(</span><span class="s">"Mesaj: %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span>
+<span class="n">perror</span><span class="p">(</span><span class="s">"Mesaj"</span><span class="p">);</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h2 id="soket-oluşturma">Soket oluşturma</h2>
+
+<h5 id="adres-aileleri">Adres aileleri</h5>
+<ul>
+  <li><em>AF_UNIX</em> - Unix domain socket</li>
+  <li><em>AF_INET</em> - Internet Protocol v4 socket</li>
+  <li><em>AF_INET6</em> - Internet Protocol v6 socket</li>
+</ul>
+
+<h4 id="socket">socket</h4>
+<p>Integer türündedir, hata durumunda <em>-1</em> döndürür ve <em>errno</em> değişkenine hata kodunu yazar. Parametrelerine sırasıyla soket türü, adres ailesi ve protokol numarası yazılır. Protokol-0 IPPROTO_IP olarak geçer ve IP protokolüdür.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="cp">#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+</span>
+<span class="kt">int</span> <span class="n">socket</span><span class="p">(</span><span class="kt">int</span> <span class="n">domain</span><span class="p">,</span> <span class="kt">int</span> <span class="n">type</span><span class="p">,</span> <span class="kt">int</span> <span class="n">protocol</span><span class="p">);</span>
+
+<span class="c1">//Örnek kullanım
+</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">;</span>
+<span class="n">sockfd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">sockfd</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">//Ben mesaj kısmına hatayı hangi fonksiyondan
+</span>  <span class="c1">//aldığımı yazmayı tercih ediyorum. Kolaylık sağlıyor.
+</span>  <span class="n">perror</span><span class="p">(</span><span class="s">"socket"</span><span class="p">);</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="struct-türleri">struct türleri</h4>
+<p>Elimizde üç struct var. <em>sockaddr</em> fonksiyonlarımızın alacağı adres yapısı, <em>sockaddr_in</em> ise bizim okumamız için basitleştirilmiş hali. Son anda fonksiyona verirken dönüştürceğiz.
+<em>sin_zero</em> , bu dönüştürme işleminin düzgün sağlanması için boyutları eşitleme adına konular bir değer.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="code"><pre><span class="cp">#include &lt;netinet/in.h&gt;
+</span>
+<span class="k">struct</span> <span class="n">sockaddr</span> <span class="p">{</span>
+  <span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">sa_family</span><span class="p">;</span> <span class="c1">//adres ailesi
+</span>  <span class="kt">char</span> <span class="n">sa_data</span><span class="p">[</span><span class="mi">14</span><span class="p">];</span> <span class="c1">//protokol adresi
+</span><span class="p">};</span>
+
+<span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="p">{</span>
+  <span class="kt">short</span> <span class="n">sin_family</span><span class="p">;</span> <span class="c1">//adres ailesi
+</span>  <span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">sin_port</span><span class="p">;</span> <span class="c1">//port
+</span>  <span class="k">struct</span> <span class="n">in_addr</span> <span class="n">sin_addr</span><span class="p">;</span> <span class="c1">//adres
+</span>  <span class="kt">char</span> <span class="n">sin_zero</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span> <span class="c1">//sıfır
+</span><span class="p">};</span>
+
+<span class="k">struct</span> <span class="n">in_addr</span> <span class="p">{</span>
+  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">s_addr</span><span class="p">;</span> <span class="c1">//32bit adres
+</span><span class="p">};</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="ağ-ev-sahibi-dönüşümleri">Ağ-Ev Sahibi dönüşümleri</h4>
+<p>Big-Endian ve Little-Endian karmaşını önlemek adına ortaya çıkan dönüşüm fonksiyonlarıdır. Çoğunlukla adres ve port belirtmede kullanılırlar.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="code"><pre><span class="cp">#include &lt;netinet/in.h&gt;
+</span>
+<span class="kt">uint32_t</span> <span class="n">htonl</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">hostlong</span><span class="p">);</span> <span class="c1">//host to network long
+</span><span class="kt">uint16_t</span> <span class="n">htons</span><span class="p">(</span><span class="kt">uint16_t</span> <span class="n">hostshort</span><span class="p">);</span> <span class="c1">//host to network short
+</span><span class="kt">uint32_t</span> <span class="n">ntohl</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">netlong</span><span class="p">);</span> <span class="c1">//network to host long
+</span><span class="kt">uint16_t</span> <span class="n">ntohs</span><span class="p">(</span><span class="kt">uint16_t</span> <span class="n">netshort</span><span class="p">);</span> <span class="c1">//network to host short
+</span><span class="n">in_addr_t</span> <span class="n">inet_addr</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">cp</span><span class="p">);</span> <span class="o">//</span><span class="n">ip</span> <span class="n">adresi</span> <span class="n">donusturur</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="adresler">Adresler</h4>
+<p>Sunucu oluştururken dinleme yapmak ve kabul etmek için, istemci oluştururken ise sunucuyu belirtmek için kullanılırlar. Her bağlantı için bir adet oluşturulur.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="code"><pre><span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">serverAddr</span><span class="p">;</span> <span class="c1">//sunucu örneği
+</span><span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span> <span class="c1">//soket ile aynı aile olmalı
+</span><span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">PORT</span><span class="p">);</span> <span class="c1">//short türünde port
+</span>
+<span class="c1">//INADDR_ANY çalışan bilgisayarın adresi demektir.
+//inet_addr'ye ihtiyaç duymaz.
+</span><span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">INADDR_ANY</span><span class="p">;</span>
+<span class="n">memset</span><span class="p">(</span><span class="o">&amp;</span><span class="p">(</span><span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_zero</span><span class="p">),</span> <span class="sc">'\0'</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span> <span class="c1">//Sıfırlar doldurulmalı!
+</span>
+<span class="c1">//istemci örneği
+</span><span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">serverAddr</span><span class="p">;</span>
+<span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+<span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">PORT</span><span class="p">);</span>
+
+<span class="c1">//Konuşacağımız sunucu adresini inet_addr ile belirtiyoruz.
+</span><span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">inet_addr</span><span class="p">(</span><span class="n">DEST_IP</span><span class="p">);</span>
+<span class="n">memset</span><span class="p">(</span><span class="o">&amp;</span><span class="p">(</span><span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_zero</span><span class="p">),</span> <span class="sc">'\0'</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="bind">bind</h4>
+<p>Oluşturulan soketi adres(port) ile eşleştirmeye yarar. İstemci tarafı için zorunlu değildir, belirtilmediğinde işletim sistemi boş bir port belirleyecektir. Dinleme yapacak sunucu tarafı için belirtilmesi zorunludur.
+Sırasıyla; soket, adres, ve adresin uzunluğunu argüman olarak alır.
+Hata durumunda <em>-1</em> döndürür ve <em>errno</em> değişkenine hata numarası atar.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="code"><pre><span class="cp">#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+</span>
+<span class="kt">int</span> <span class="n">bind</span><span class="p">(</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="k">const</span> <span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="n">addr</span><span class="p">,</span>
+        <span class="n">socklen_t</span> <span class="n">addrlen</span><span class="p">);</span>
+
+<span class="c1">//Örnek kullanım
+</span><span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">bind</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">serverAddr</span><span class="p">,</span>
+        <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span><span class="p">)))</span> <span class="p">{</span>
+  <span class="n">perror</span><span class="p">(</span><span class="s">"bind"</span><span class="p">);</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="connect">connect</h4>
+<p>Dinlemede olan sokete/adrese bağlanmayı sağlar. SOCK_DGRAM türünde kullanılması zorunlu değildir. Hata durumunda <em>-1</em> döndürür ve <em>errno</em> değişkenine hata numarası atar. Parametre olarak soket, adres ve adresin uzunluğunu alır.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="cp">#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+</span>
+<span class="kt">int</span> <span class="n">connect</span><span class="p">(</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="k">const</span> <span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="n">addr</span><span class="p">,</span> <span class="n">socklen_t</span> <span class="n">addrlen</span><span class="p">);</span>
+
+<span class="c1">//Örnek kullanım
+</span><span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">connect</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">serverAddr</span><span class="p">,</span>
+        <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span><span class="p">)))</span> <span class="p">{</span>
+  <span class="n">perror</span><span class="p">(</span><span class="s">"connect"</span><span class="p">);</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="listen">listen</h4>
+<p>Soketin bağlantıları beklemeye yani belirtilen adresteki portu dinlemeye başlamasını sağlar. <strong><em>bind</em> komutu sonrası kullanılır.</strong> SOCK_DGRAM için kullanılması zorunlu değildir.
+Hata durumunda <em>-1</em> döndürür ve <em>errno</em> değişkenine hata numarası atar. Parametre olarak soketi ve kuyrukta bekletilecek bağlantı sayısını alır.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="cp">#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+</span>
+<span class="kt">int</span> <span class="n">listen</span><span class="p">(</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="kt">int</span> <span class="n">backlog</span><span class="p">);</span>
+
+<span class="c1">//Örnek kullanım
+</span><span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">listen</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">perror</span><span class="p">(</span><span class="s">"listen"</span><span class="p">);</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="accept">accept</h4>
+<p><em>listen</em> ile dinlemedeyken gelen bağlantıyı kabul eder ama sadece bir bağlantıyı kabul eder. Geriye yeni bir soket döndürür. SOCK_DGRAM için kullanılması zorunlu değildir. Hata durumunda <em>-1</em> döndürür ve <em>errno</em> değişkenine hata numarası atar.
+İkinci parametresi ile yeni bir adres oluşturur.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="code"><pre><span class="cp">#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+</span>
+<span class="kt">int</span> <span class="n">accept</span><span class="p">(</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="n">addr</span><span class="p">,</span> <span class="n">socklen_t</span> <span class="o">*</span><span class="n">addrlen</span><span class="p">);</span>
+
+<span class="c1">//Örnek Kullanım
+//newfd yeni soketimiz. İstemci ile haberleşirken bunu kullanacağız.
+</span><span class="kt">int</span> <span class="n">structSize</span><span class="p">,</span> <span class="n">newfd</span><span class="p">;</span>
+<span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">clientAddr</span><span class="p">;</span>
+<span class="n">structSize</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">clientAddr</span><span class="p">);</span>
+<span class="n">newfd</span> <span class="o">=</span> <span class="n">accept</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">clientAddr</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">structSize</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">newfd</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">perror</span><span class="p">(</span><span class="s">"accept"</span><span class="p">);</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="send-sendto-recv-recvfrom">send, sendto, recv, recvfrom</h4>
+<p><em>send</em> ve <em>sendto</em> veri göndermeye, <em>recv</em> ve <em>recvfrom</em> ise veri almaya yarayan fonksiyonlardır. <em>send</em> ve <em>recv</em> <em>connect</em> ile bağlanılan adreslerle çalışırlar. <em>sendto</em> ve <em>recvfrom</em> fonksiyonları parametre olarak adres de alırlar.
+SOCK_STREAM ile <em>send</em> ve <em>recv</em> fonksiyonları kullanılır. SOCK_DGRAM ile çalışılırken <em>connect</em> ile bağlantı yapıldıysa <em>send</em> ve <em>recv</em> kullanılabilir, onun dışında <em>sendto</em> ve <em>recvfrom</em> kullanılarak adres belirtilmelidir.
+Her zamanki gibi hata durumunda <em>-1</em> döndürür ve <em>errno</em> ataması yaparlar.
+Başarılı durumlarda <em>send</em> ve <em>sendto</em> gönderilen bayt sayısını döndürür. <em>recv</em> ve <em>recvto</em> ise alınan bayt değerini dönrürür. Gönderilen bayt sayısı gönderilmek istenilenden eksik olabilir. Kontrol etmek ve düzeltme uygulamak sizin sorumluluğunuza kalır.
+<em>recv</em> bağlantının kesilmesi durumunda özel olarak <em>0</em> döndürür. Kontrol sistemi olmadığı için <em>recvfrom</em> ile bağlantı açık mı kapalı mı öğrenilemez.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+</pre></td><td class="code"><pre><span class="cp">#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+</span>
+<span class="kt">ssize_t</span> <span class="n">send</span><span class="p">(</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">buf</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">);</span>
+<span class="kt">ssize_t</span> <span class="n">sendto</span><span class="p">(</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">buf</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">,</span>
+        <span class="k">const</span> <span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="n">dest_addr</span><span class="p">,</span> <span class="n">socklen_t</span> <span class="n">addrlen</span><span class="p">);</span>
+
+<span class="kt">ssize_t</span> <span class="n">recv</span><span class="p">(</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">buf</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">);</span>
+<span class="kt">ssize_t</span> <span class="n">recvfrom</span><span class="p">(</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">buf</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">,</span>
+        <span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="n">src_addr</span><span class="p">,</span> <span class="n">socklen_t</span> <span class="o">*</span><span class="n">addrlen</span><span class="p">);</span>
+
+<span class="c1">//Örnek kullanımlar
+</span><span class="kt">char</span> <span class="o">*</span><span class="n">gonder</span> <span class="o">=</span> <span class="s">"ozanselte.com"</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">gidenBayt</span><span class="p">;</span>
+<span class="n">gidenBayt</span> <span class="o">=</span> <span class="n">send</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="n">gonder</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">gonder</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+<span class="n">gidenBayt</span> <span class="o">=</span> <span class="n">sendfrom</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="n">gonder</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">gonder</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">addr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span><span class="p">));</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">gidenBayt</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">perror</span><span class="p">(</span><span class="s">"send"</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">gonder</span><span class="p">)</span> <span class="o">!=</span> <span class="n">gidenBayt</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">"Gönderilen: %d </span><span class="se">\t</span><span class="s"> Giden: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+          <span class="n">strlen</span><span class="p">(</span><span class="n">gonder</span><span class="p">),</span> <span class="n">gidenBayt</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cp">#define AZAMIUZUNLUK 1024
+</span><span class="kt">char</span> <span class="n">str</span><span class="p">[</span><span class="n">AZAMIUZUNLUK</span><span class="p">];</span>
+<span class="kt">int</span> <span class="n">gelenBayt</span><span class="p">;</span>
+<span class="n">gelenBayt</span> <span class="o">=</span> <span class="n">recv</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">str</span><span class="p">,</span> <span class="n">AZAMIUZUNLUK</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="n">gelenBayt</span> <span class="o">=</span> <span class="n">recvfrom</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">str</span><span class="p">,</span> <span class="n">AZAMIUZUNLUK</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">addr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span><span class="p">));</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">gelenBayt</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">perror</span><span class="p">(</span><span class="s">"recv"</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">gelenBayt</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">"Bağlantı kapalı.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="close">close</h4>
+<p>Soketi ve bağlantıyı düzgünce kapatır. İki taraf da veri gönderip alamaz. Tek parametre olarak soketi alır.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="code"><pre><span class="n">close</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">);</span>
+
+<span class="c1">//Örnek Kullanım
+</span><span class="n">close</span><span class="p">(</span><span class="n">sockfd</span><span class="p">);</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h2 id="son">Son</h2>
+<p>Örnek sunucu ve istemci kodlarını da vererek rehberi tamamlıyorum. Sorularınızı ve isteklerinizi yorum olarak belirtebilirsiniz.</p>
+
+<h4 id="sunucu">Sunucu</h4>
+<p><img src="/images/posts/istemci.jpg" alt="sunucu" class="img-fluid img-thumbnail" /></p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+</pre></td><td class="code"><pre><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;errno.h&gt;
+</span>
+<span class="cp">#define LISTENPORT 2015
+#define AZAMIUZUNLUK 1024
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="n">newfd</span><span class="p">;</span> 
+	<span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">serverAddr</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">clientAddr</span><span class="p">;</span>
+	<span class="kt">char</span> <span class="o">*</span><span class="n">gonder</span> <span class="o">=</span> <span class="s">"ozanselte.com"</span><span class="p">;</span>
+	<span class="kt">char</span> <span class="n">str</span><span class="p">[</span><span class="n">AZAMIUZUNLUK</span><span class="p">];</span>
+	<span class="kt">int</span> <span class="n">gelenBayt</span><span class="p">,</span> <span class="n">gidenBayt</span><span class="p">,</span> <span class="n">structSize</span><span class="p">;</span>
+
+	<span class="n">sockfd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> 
+	<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">sockfd</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">perror</span><span class="p">(</span><span class="s">"socket"</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+	<span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">LISTENPORT</span><span class="p">);</span>
+	<span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">INADDR_ANY</span><span class="p">;</span>
+	<span class="n">memset</span><span class="p">(</span><span class="o">&amp;</span><span class="p">(</span><span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_zero</span><span class="p">),</span> <span class="sc">'\0'</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">bind</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">serverAddr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span><span class="p">)))</span> <span class="p">{</span>
+		<span class="n">perror</span><span class="p">(</span><span class="s">"bind"</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">listen</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span> <span class="p">{</span>
+		<span class="n">perror</span><span class="p">(</span><span class="s">"listen"</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="n">structSize</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">clientAddr</span><span class="p">);</span>
+	<span class="n">newfd</span> <span class="o">=</span> <span class="n">accept</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">clientAddr</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">structSize</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">newfd</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">perror</span><span class="p">(</span><span class="s">"accept"</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="n">gelenBayt</span> <span class="o">=</span> <span class="n">recv</span><span class="p">(</span><span class="n">newfd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">str</span><span class="p">,</span> <span class="n">AZAMIUZUNLUK</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">gelenBayt</span><span class="p">)</span> <span class="p">{</span>  
+		<span class="n">perror</span><span class="p">(</span><span class="s">"recv"</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">gelenBayt</span><span class="p">)</span> <span class="p">{</span>  
+		<span class="n">printf</span><span class="p">(</span><span class="s">"Bağlantı kapalı.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"%d bayt aldım:</span><span class="se">\t</span><span class="s">%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">gelenBayt</span><span class="p">,</span> <span class="n">str</span><span class="p">);</span>
+
+	<span class="n">gidenBayt</span> <span class="o">=</span> <span class="n">send</span><span class="p">(</span><span class="n">newfd</span><span class="p">,</span> <span class="n">gonder</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">gonder</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">gidenBayt</span><span class="p">)</span> <span class="p">{</span>  
+		<span class="n">perror</span><span class="p">(</span><span class="s">"send"</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">gonder</span><span class="p">)</span> <span class="o">!=</span> <span class="n">gidenBayt</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">printf</span><span class="p">(</span><span class="s">"Gönderilen: %d</span><span class="se">\t</span><span class="s">Giden: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">gonder</span><span class="p">),</span> <span class="n">gidenBayt</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"%d bayt gönderdim:</span><span class="se">\t</span><span class="s">%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">gidenBayt</span><span class="p">,</span> <span class="n">gonder</span><span class="p">);</span>
+
+	<span class="n">close</span><span class="p">(</span><span class="n">newfd</span><span class="p">);</span>
+	<span class="n">close</span><span class="p">(</span><span class="n">sockfd</span><span class="p">);</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="i̇stemci">İstemci</h4>
+<p><img src="/images/posts/istemci.jpg" alt="istemci" class="img-fluid img-thumbnail" /></p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+</pre></td><td class="code"><pre><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;errno.h&gt;
+</span>
+<span class="cp">#define SUNUCUPORT 2015
+#define SUNUCUIP "127.0.0.1"
+#define AZAMIUZUNLUK 1024
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="kt">int</span> <span class="n">sockfd</span><span class="p">;</span> 
+	<span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">serverAddr</span><span class="p">;</span>
+	<span class="kt">char</span> <span class="o">*</span><span class="n">gonder</span> <span class="o">=</span> <span class="s">"Kaynak hangi site?"</span><span class="p">;</span>
+	<span class="kt">char</span> <span class="n">str</span><span class="p">[</span><span class="n">AZAMIUZUNLUK</span><span class="p">];</span>
+	<span class="kt">int</span> <span class="n">gelenBayt</span><span class="p">,</span> <span class="n">gidenBayt</span><span class="p">,</span> <span class="n">structSize</span><span class="p">;</span>
+
+	<span class="n">sockfd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> 
+	<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">sockfd</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">perror</span><span class="p">(</span><span class="s">"socket"</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+	<span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">SUNUCUPORT</span><span class="p">);</span>
+	<span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">inet_addr</span><span class="p">(</span><span class="n">SUNUCUIP</span><span class="p">);</span>
+	<span class="n">memset</span><span class="p">(</span><span class="o">&amp;</span><span class="p">(</span><span class="n">serverAddr</span><span class="p">.</span><span class="n">sin_zero</span><span class="p">),</span> <span class="sc">'\0'</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">connect</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">serverAddr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span><span class="p">)))</span> <span class="p">{</span>
+		<span class="n">perror</span><span class="p">(</span><span class="s">"connect"</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="n">gidenBayt</span> <span class="o">=</span> <span class="n">send</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="n">gonder</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">gonder</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">gidenBayt</span><span class="p">)</span> <span class="p">{</span>  
+		<span class="n">perror</span><span class="p">(</span><span class="s">"send"</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">gonder</span><span class="p">)</span> <span class="o">!=</span> <span class="n">gidenBayt</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">printf</span><span class="p">(</span><span class="s">"Gönderilen: %d</span><span class="se">\t</span><span class="s">Giden: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">gonder</span><span class="p">),</span> <span class="n">gidenBayt</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"%d bayt gönderdim:</span><span class="se">\t</span><span class="s">%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">gidenBayt</span><span class="p">,</span> <span class="n">gonder</span><span class="p">);</span>
+
+	<span class="n">gelenBayt</span> <span class="o">=</span> <span class="n">recv</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">str</span><span class="p">,</span> <span class="n">AZAMIUZUNLUK</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">gelenBayt</span><span class="p">)</span> <span class="p">{</span>  
+		<span class="n">perror</span><span class="p">(</span><span class="s">"recv"</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">gelenBayt</span><span class="p">)</span> <span class="p">{</span>  
+		<span class="n">printf</span><span class="p">(</span><span class="s">"Bağlantı kapalı.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"%d bayt aldım:</span><span class="se">\t</span><span class="s">%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">gelenBayt</span><span class="p">,</span> <span class="n">str</span><span class="p">);</span>
+
+	<span class="n">close</span><span class="p">(</span><span class="n">sockfd</span><span class="p">);</span>
+<span class="p">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+</article>
+<div class="col-sm-12">
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {this.page.url = 'https://www.ozanselte.com/c-ile-soket-programlama-rehberi/';};
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://ozanselte.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div></div>
+<footer class="container mb-3">
+<div class="row">
+<div class="col text-center"><a class="nav-link" href="https://github.com/ozanselte"><i class="fab fa-github fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.facebook.com/ozanselte"><i class="fab fa-facebook fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://twitter.com/ozanselte"><i class="fab fa-twitter fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.instagram.com/ozanselte"><i class="fab fa-instagram fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.linkedin.com/in/ozanselte"><i class="fab fa-linkedin fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://t.me/ozanselte"><i class="fab fa-telegram fa-lg"></i> ozanselte</a></div>
+</div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '');
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+</body>
+</html>

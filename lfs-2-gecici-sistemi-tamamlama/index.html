@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="">
+<link rel='icon' type='image/x-icon' href='/images/site/favicon.ico'>
+<title>LFS 2 - Geçici Sistemi Tamamlama</title>
+<meta name="description" content="Şimdi kafanızda bir şeyler canlandırmanız gerekiyor. Bir önceki yazıda yaptıklarımızı hatırlayın. Bazı paketlere 1.Aşama demiştik. Şimdi onları tekrar derley...">
+<link rel="canonical" href="https://www.ozanselte.com//lfs-2-gecici-sistemi-tamamlama/">
+<meta name="keywords" content=", , , , ">
+<meta name="referrer" content="origin">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link href="/assets/css/style.css" rel="stylesheet">
+<style>
+header {
+background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.25)), url("/images/post_covers/man_on_computer.jpg") no-repeat scroll center center / cover;
+}
+</style>
+</head>
+<body>
+<header class="container-fluid">
+<nav class="navbar navbar-expand-md navbar-dark">
+<div class="container">
+<a class="navbar-brand" href="/">Ozan Şelte</a>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ml-auto">
+
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" href="#" id="navbarDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Kategoriler</a>
+<div class="dropdown-menu" aria-labelledby="navbarDrop">
+<a class="dropdown-item" href="/programlama">Programlama</a><a class="dropdown-item" href="/genel">Genel</a><a class="dropdown-item" href="/linux">Linux</a><a class="dropdown-item" href="/c-ve-c++">C ve C++</a><a class="dropdown-item" href="/oyun-programlama">Oyun Programlama</a>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+<div class="text-center">
+<a href="/" title=""><img class="rounded mx-auto d-block" alt="" src="/images/site/ozanselte.png"></a><h1><a href="/" title="">Ozan Şelte</a><br><small>Mühendis Adayı</small></h1>
+</div>
+</header>
+<br>
+<div class="container"><div class="row">
+<article class="col-sm-12 text-justify">
+<h1>LFS 2 - Geçici Sistemi Tamamlama<br><small>11 Ağustos 2015 - 
+<a href="/linux"><strong class="d-inline-block mb-2 mr-3" style="color: var(--purple);">Linux</strong></a></small></h1>
+<p>Şimdi kafanızda bir şeyler canlandırmanız gerekiyor. Bir önceki yazıda yaptıklarımızı hatırlayın. Bazı paketlere <em>1.Aşama</em> demiştik. Şimdi onları tekrar derleyeceğiz ama neden?
+Sistemimizde var olan gcc, binutils benzeri paketler yapı marketlerden satın aldığınız hazır araçlardır. Bir önceki yazıda satın aldığımız araçlarla kendi çekicimizi yaptık. Şimdi ise ilk yapacağımız iş kendi çekicimizle kendimize yeni bir çekiç yapmak. Bu sayede geçici sistemimizi %100 bu iş için özel hazırlanmış araçlarla oluşturacağız.
+Bir not atalım. Kitapta bazı programları derlediğimizde sisteme nelerin kurulduğu belirtilmiş, ben de buraya yazacağım.
+<strong>Kalın yazdıklarım programdır.</strong><br />
+<em>İtalik yazdıklarım ise kütüphanedir.</em> Başlayalım.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+</pre></td><td class="code"><pre>su - lfs</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="binutils2aşama">Binutils(2.Aşama)</h4>
+<p>Derleme süresi: 1 SBU, Gerekli disk alanı: 574 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf binutils-2.25.tar.bz2  
+<span class="nb">cd </span>binutils-2.25  
+mkdir <span class="nt">-v</span> ../binutils-build  
+<span class="nb">cd</span> ../binutils-build
+
+<span class="nv">CC</span><span class="o">=</span><span class="nv">$LFS_TGT</span><span class="nt">-gcc</span>                <span class="se">\</span>
+<span class="nv">AR</span><span class="o">=</span><span class="nv">$LFS_TGT</span><span class="nt">-ar</span>                 <span class="se">\</span>
+<span class="nv">RANLIB</span><span class="o">=</span><span class="nv">$LFS_TGT</span><span class="nt">-ranlib</span>         <span class="se">\</span>
+../binutils-2.25/configure     <span class="se">\</span>
+    <span class="nt">--prefix</span><span class="o">=</span>/tools            <span class="se">\</span>
+    <span class="nt">--disable-nls</span>              <span class="se">\</span>
+    <span class="nt">--disable-werror</span>           <span class="se">\</span>
+    <span class="nt">--with-lib-path</span><span class="o">=</span>/tools/lib <span class="se">\</span>
+    <span class="nt">--with-sysroot</span>
+
+make
+make install
+
+<span class="c"># bu komutlar sonraki derlemeler için gerekli temizlikler</span>
+make <span class="nt">-C</span> ld clean
+make <span class="nt">-C</span> ld <span class="nv">LIB_PATH</span><span class="o">=</span>/usr/lib:/lib
+cp <span class="nt">-v</span> ld/ld-new /tools/bin
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> binutils-2.25/
+rm <span class="nt">-rf</span> binutils-build/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gcc2aşama">GCC(2.Aşama)</h4>
+<p>Derleme süresi: 7.7 SBU, Gerekli disk alanı: 2.6 GB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar</span> <span class="nt">-xvf</span> gcc-4.9.2.tar.bz2  
+<span class="nb">cd </span>gcc-4.9.2  
+
+<span class="nb">cat </span>gcc/limitx.h gcc/glimits.h gcc/limity.h <span class="o">&gt;</span> <span class="se">\</span>
+  <span class="sb">`</span>dirname <span class="k">$(</span><span class="nv">$LFS_TGT</span><span class="nt">-gcc</span> <span class="nt">-print-libgcc-file-name</span><span class="k">)</span><span class="sb">`</span>/include-fixed/limits.h
+<span class="k">for </span>file <span class="k">in</span> <span class="se">\</span>
+ <span class="k">$(</span>find gcc/config <span class="nt">-name</span> linux64.h <span class="nt">-o</span> <span class="nt">-name</span> linux.h <span class="nt">-o</span> <span class="nt">-name</span> sysv4.h<span class="k">)</span>
+<span class="k">do
+  </span>cp <span class="nt">-uv</span> <span class="nv">$file</span><span class="o">{</span>,.orig<span class="o">}</span>
+  sed <span class="nt">-e</span> <span class="s1">'s@/lib\(64\)\?\(32\)\?/ld@/tools&amp;@g'</span> <span class="se">\</span>
+      <span class="nt">-e</span> <span class="s1">'s@/usr@/tools@g'</span> <span class="nv">$file</span>.orig <span class="o">&gt;</span> <span class="nv">$file</span>
+  <span class="nb">echo</span> <span class="s1">'
+#undef STANDARD_STARTFILE_PREFIX_1
+#undef STANDARD_STARTFILE_PREFIX_2
+#define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
+#define STANDARD_STARTFILE_PREFIX_2 ""'</span> <span class="o">&gt;&gt;</span> <span class="nv">$file</span>
+  touch <span class="nv">$file</span>.orig
+<span class="k">done
+
+</span><span class="nb">tar</span> <span class="nt">-xf</span> ../mpfr-3.1.2.tar.xz
+mv <span class="nt">-v</span> mpfr-3.1.2 mpfr
+<span class="nb">cd </span>mpfr
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../../mpfr-3.1.2-upstream_fixes-3.patch  
+<span class="nb">cd</span> ..
+<span class="nb">tar</span> <span class="nt">-xf</span> ../gmp-6.0.0a.tar.xz
+mv <span class="nt">-v</span> gmp-6.0.0 gmp
+<span class="nb">tar</span> <span class="nt">-xf</span> ../mpc-1.0.2.tar.gz
+mv <span class="nt">-v</span> mpc-1.0.2 mpc
+
+mkdir <span class="nt">-v</span> ../gcc-build  
+<span class="nb">cd</span> ../gcc-build
+
+<span class="nv">CC</span><span class="o">=</span><span class="nv">$LFS_TGT</span><span class="nt">-gcc</span>                                      <span class="se">\</span>
+<span class="nv">CXX</span><span class="o">=</span><span class="nv">$LFS_TGT</span><span class="nt">-g</span>++                                     <span class="se">\</span>
+<span class="nv">AR</span><span class="o">=</span><span class="nv">$LFS_TGT</span><span class="nt">-ar</span>                                       <span class="se">\</span>
+<span class="nv">RANLIB</span><span class="o">=</span><span class="nv">$LFS_TGT</span><span class="nt">-ranlib</span>                               <span class="se">\</span>
+../gcc-4.9.2/configure                               <span class="se">\</span>
+    <span class="nt">--prefix</span><span class="o">=</span>/tools                                  <span class="se">\</span>
+    <span class="nt">--with-local-prefix</span><span class="o">=</span>/tools                       <span class="se">\</span>
+    <span class="nt">--with-native-system-header-dir</span><span class="o">=</span>/tools/include   <span class="se">\</span>
+    <span class="nt">--enable-languages</span><span class="o">=</span>c,c++                         <span class="se">\</span>
+    <span class="nt">--disable-libstdcxx-pch</span>                          <span class="se">\</span>
+    <span class="nt">--disable-multilib</span>                               <span class="se">\</span>
+    <span class="nt">--disable-bootstrap</span>                              <span class="se">\</span>
+    <span class="nt">--disable-libgomp</span>
+
+make
+make install
+ln <span class="nt">-sv</span> gcc /tools/bin/cc
+
+<span class="c"># testlerimizi yapalım</span>
+<span class="nb">echo</span> <span class="s1">'main(){}'</span> <span class="o">&gt;</span> dummy.c
+cc dummy.c
+readelf <span class="nt">-l</span> a.out | <span class="nb">grep</span> <span class="s1">': /tools'</span>
+<span class="c"># örnek çıktı</span>
+<span class="c"># [Requesting program interpreter: /tools/lib/ld-linux.so.2]</span>
+rm <span class="nt">-v</span> dummy.c a.out
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> gcc-4.9.2/
+rm <span class="nt">-rf</span> gcc-build/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="tcl">Tcl</h4>
+<p>Derleme süresi: 0.8 SBU, Gerekli disk alanı: 67 MB, Kurulanlar:</p>
+
+<ul>
+  <li><strong>tclsh8.6</strong></li>
+  <li><strong>tclsh</strong></li>
+  <li><em>libtcl8.6.so</em></li>
+  <li><em>libtclstub8.6.a</em></li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf tcl8.6.3-src.tar.gz  
+<span class="nb">cd </span>tcl8.6.3
+
+<span class="nb">cd </span>unix
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+chmod <span class="nt">-v</span> u+w /tools/lib/libtcl8.6.so
+make install-private-headers
+ln <span class="nt">-sv</span> tclsh8.6 /tools/bin/tclsh
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> tcl8.6.3/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="expect">Expect</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 4.6 MB, Kurulanlar:</p>
+
+<ul>
+  <li><strong>expect</strong></li>
+  <li><em>libexpect-5.45.so</em></li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf expect5.45.tar.gz
+<span class="nb">cd </span>expect5.45
+
+cp <span class="nt">-v</span> configure<span class="o">{</span>,.orig<span class="o">}</span>
+sed <span class="s1">'s:/usr/local/bin:/bin:'</span> configure.orig <span class="o">&gt;</span> configure
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools       <span class="se">\</span>
+            <span class="nt">--with-tcl</span><span class="o">=</span>/tools/lib <span class="se">\</span>
+            <span class="nt">--with-tclinclude</span><span class="o">=</span>/tools/include
+make
+make <span class="nv">SCRIPTS</span><span class="o">=</span><span class="s2">""</span> install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> expect5.45/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="dejagnu">DejaGNU</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 4.6 MB, Kurulanlar:</p>
+
+<ul>
+  <li><strong>runtest</strong></li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf dejagnu-1.5.2.tar.gz
+<span class="nb">cd </span>dejagnu-1.5.2
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> dejagnu-1.5.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="check">Check</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 11 MB, Kurulanlar:</p>
+
+<ul>
+  <li><strong>checkmk</strong></li>
+  <li><em>libcheck.a</em></li>
+  <li><em>libcheck.so</em></li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf check-0.9.14.tar.gz
+<span class="nb">cd </span>check-0.9.14
+
+<span class="nv">PKG_CONFIG</span><span class="o">=</span> ./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> check-0.9.14/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="ncurses">Ncurses</h4>
+<p>Derleme süresi: 0.5 SBU, Gerekli disk alanı: 45 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf ncurses-5.9.tar.gz
+<span class="nb">cd </span>ncurses-5.9
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools <span class="se">\</span>
+            <span class="nt">--with-shared</span>   <span class="se">\</span>
+            <span class="nt">--without-debug</span> <span class="se">\</span>
+            <span class="nt">--without-ada</span>   <span class="se">\</span>
+            <span class="nt">--enable-widec</span>  <span class="se">\</span>
+            <span class="nt">--enable-overwrite</span>
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> ncurses-5.9/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="bash">Bash</h4>
+<p>Derleme süresi: 0.4 SBU, Gerekli disk alanı: 63 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf bash-4.3.30.tar.gz
+<span class="nb">cd </span>bash-4.3.30
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../bash-4.3.30-upstream_fixes-1.patch
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools <span class="nt">--without-bash-malloc</span>
+make
+make install
+ln <span class="nt">-sv</span> bash /tools/bin/sh
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> bash-4.3.30/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="bzip2">Bzip2</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 6.4 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf bzip2-1.0.6.tar.gz
+<span class="nb">cd </span>bzip2-1.0.6
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../bzip2-1.0.6-install_docs-1.patch
+
+make
+make <span class="nv">PREFIX</span><span class="o">=</span>/tools install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> bzip2-1.0.6/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="coreutils">Coreutils</h4>
+<p>Derleme süresi: 0.6 SBU, Gerekli disk alanı: 162 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf coreutils-8.23.tar.xz
+<span class="nb">cd </span>coreutils-8.23
+<span class="c"># burada aslında bir patch var fakat kurunca hata verdiği için yapılmaması gereken bir patch. Biz de yapmadan devam ediyoruz.</span>
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools <span class="nt">--enable-install-program</span><span class="o">=</span>hostname
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> coreutils-8.23/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="diffutils">Diffutils</h4>
+<p>Derleme süresi: 0.2 SBU, Gerekli disk alanı: 21 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf diffutils-3.3.tar.xz
+<span class="nb">cd </span>diffutils-3.3
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> diffutils-3.3/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="file">File</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 16.9 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf file-5.22.tar.gz
+<span class="nb">cd </span>file-5.22
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> file-5.22/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="findutils">Findutils</h4>
+<p>Derleme süresi: 0.2 SBU, Gerekli disk alanı: 29 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf findutils-4.4.2.tar.gz
+<span class="nb">cd </span>findutils-4.4.2
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> findutils-4.4.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gawk">Gawk</h4>
+<p>Derleme süresi: 0.2 SBU, Gerekli disk alanı: 37 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf gawk-4.1.1.tar.xz
+<span class="nb">cd </span>gawk-4.1.1
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> gawk-4.1.1/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gettext">Gettext</h4>
+<p>Derleme süresi: 1 SBU, Gerekli disk alanı: 153 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf gettext-0.19.4.tar.xz
+<span class="nb">cd </span>gettext-0.19.4
+
+<span class="nb">cd </span>gettext-tools
+<span class="nv">EMACS</span><span class="o">=</span><span class="s2">"no"</span> ./configure <span class="nt">--prefix</span><span class="o">=</span>/tools <span class="nt">--disable-shared</span>
+
+make <span class="nt">-C</span> gnulib-lib
+make <span class="nt">-C</span> intl pluralx.c
+make <span class="nt">-C</span> src msgfmt
+make <span class="nt">-C</span> src msgmerge
+make <span class="nt">-C</span> src xgettext
+
+cp <span class="nt">-v</span> src/<span class="o">{</span>msgfmt,msgmerge,xgettext<span class="o">}</span> /tools/bin
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> gettext-0.19.4/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="grep">Grep</h4>
+<p>Derleme süresi: 0.2 SBU, Gerekli disk alanı: 20 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf grep-2.21.tar.xz
+<span class="nb">cd </span>grep-2.21.tar.xz
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> grep-2.21.tar.xz/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gzip">Gzip</h4>
+<p>Derleme süresi: 0.4 SBU, Gerekli disk alanı: 9.9 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf gzip-1.6.tar.xz
+<span class="nb">cd </span>gzip-1.6
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> gzip-1.6/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="m4">M4</h4>
+<p>Derleme süresi: 0.2 SBU, Gerekli disk alanı: 20 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf m4-1.4.17.tar.xz
+<span class="nb">cd </span>m4-1.4.17
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> m4-1.4.17/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="make">Make</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 14.1 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf make-4.1.tar.bz2
+<span class="nb">cd </span>make-4.1
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools <span class="nt">--without-guile</span>
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> make-4.1/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="patch">Patch</h4>
+<p>Derleme süresi: 0.2 SBU, Gerekli disk alanı: 11.3 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf patch-2.7.4.tar.xz
+<span class="nb">cd </span>patch-2.7.4
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> patch-2.7.4/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="perl">Perl</h4>
+<p>Derleme süresi: 1.2 SBU, Gerekli disk alanı: 298 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf perl-5.20.2.tar.bz2
+<span class="nb">cd </span>perl-5.20.2
+
+sh Configure <span class="nt">-des</span> <span class="nt">-Dprefix</span><span class="o">=</span>/tools <span class="nt">-Dlibs</span><span class="o">=</span><span class="nt">-lm</span>
+make
+
+cp <span class="nt">-v</span> perl cpan/podlators/pod2man /tools/bin
+mkdir <span class="nt">-pv</span> /tools/lib/perl5/5.20.2
+cp <span class="nt">-Rv</span> lib/<span class="k">*</span> /tools/lib/perl5/5.20.2
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> perl-5.20.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="sed">Sed</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 10.7 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf sed-4.2.2.tar.bz2
+<span class="nb">cd </span>sed-4.2.2
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> sed-4.2.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="tar">Tar</h4>
+<p>Derleme süresi: 0.3 SBU, Gerekli disk alanı: 36 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf tar-1.28.tar.xz
+<span class="nb">cd </span>tar-1.28
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> tar-1.28/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="texinfo">Texinfo</h4>
+<p>Derleme süresi: 0.2 SBU, Gerekli disk alanı: 100 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf texinfo-5.2.tar.xz
+<span class="nb">cd </span>texinfo-5.2
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> texinfo-5.2/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="util-linux">Util-linux</h4>
+<p>Derleme süresi: 0.6 SBU, Gerekli disk alanı: 139 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf util-linux-2.26.tar.xz
+<span class="nb">cd </span>util-linux-2.26
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools                <span class="se">\</span>
+            <span class="nt">--without-python</span>               <span class="se">\</span>
+            <span class="nt">--disable-makeinstall-chown</span>    <span class="se">\</span>
+            <span class="nt">--without-systemdsystemunitdir</span> <span class="se">\</span>
+            <span class="nv">PKG_CONFIG</span><span class="o">=</span><span class="s2">""</span>
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> util-linux-2.26/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="xz">Xz</h4>
+<p>Derleme süresi: 0.3 SBU, Gerekli disk alanı: 21 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources  
+<span class="nb">tar </span>xvf xz-5.2.0.tar.xz
+<span class="nb">cd </span>xz-5.2.0
+
+./configure <span class="nt">--prefix</span><span class="o">=</span>/tools
+make
+make install
+
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> xz-5.2.0/</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Geçici sistemimizi sonunda tamamladık. Bu sistem ile asıl LFS sistemimizi derleyeceğiz. Umarım ki farketmedim bir sorun çıkmamıştır.</p>
+
+<h3 id="temizlikstripping">Temizlik(Stripping)</h3>
+<p>Burada fazlalık olarak oluşturular dosyaları temizleyeceğiz. Çünkü gurularımız bir dahaki bölüm için 3GB boş alan olmalı diyorlar. Bu komutlarda hata almanız önemli değil zaten <strong>varsa</strong> siliyor.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="code"><pre>strip <span class="nt">--strip-debug</span> /tools/lib/<span class="k">*</span>
+/usr/bin/strip <span class="nt">--strip-unneeded</span> /tools/<span class="o">{</span>,s<span class="o">}</span>bin/<span class="k">*</span>
+
+rm <span class="nt">-rf</span> /tools/<span class="o">{</span>,share<span class="o">}</span>/<span class="o">{</span>info,man,doc<span class="o">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h3 id="kullanıcı-ayarları">Kullanıcı ayarları</h3>
+<p>Artık asıl LFS sistemimizi kuracağımız geçici sistemi hazırlamış olduğumuza göre <em>lfs</em> kullanıcısıyla bir işimiz kalmadı. Çıkalım ve <em>root</em> olalım. <em>$LFS</em> tanımının var olduğundan emin olun. Tavsiyem <em>/root/.bashrc</em> dosyanıza eklemenizdir.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="code"><pre><span class="nb">export </span><span class="nv">LFS</span><span class="o">=</span>/mnt/lfs
+chown <span class="nt">-R</span> root:root <span class="nv">$LFS</span>/tools</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Kitap burada not düşmüş. Eğer ileride başka bir LFS çalışması planlıyorsak <em>/tools</em> klasörünü yedeklememizi istiyor. Çünkü bir sonraki bölümde buraya müdahale edeceğiz. Eğer niyetiniz varsa yedekleyin.</p>
+
+</article>
+<div class="col-sm-12">
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {this.page.url = 'https://www.ozanselte.com/lfs-2-gecici-sistemi-tamamlama/';};
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://ozanselte.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div></div>
+<footer class="container mb-3">
+<div class="row">
+<div class="col text-center"><a class="nav-link" href="https://github.com/ozanselte"><i class="fab fa-github fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.facebook.com/ozanselte"><i class="fab fa-facebook fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://twitter.com/ozanselte"><i class="fab fa-twitter fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.instagram.com/ozanselte"><i class="fab fa-instagram fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.linkedin.com/in/ozanselte"><i class="fab fa-linkedin fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://t.me/ozanselte"><i class="fab fa-telegram fa-lg"></i> ozanselte</a></div>
+</div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '');
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+</body>
+</html>

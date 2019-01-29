@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="">
+<link rel='icon' type='image/x-icon' href='/images/site/favicon.ico'>
+<title>Godot Oyun Motoru'na Başlangıç</title>
+<meta name="description" content="Godot Nedir?Godot Unity3D benzeri 2 ve 3 boyutlu bir oyun motorudur. Unity3D’ye çok benzer bir tasarımı vardır. Farklı olarak GDScript adlı Python benzeri bi...">
+<link rel="canonical" href="https://www.ozanselte.com//godot-oyun-motoruna-baslangic/">
+<meta name="keywords" content=", , , , , ">
+<meta name="referrer" content="origin">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link href="/assets/css/style.css" rel="stylesheet">
+<style>
+header {
+background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.25)), url("/images/post_covers/city.jpg") no-repeat scroll center center / cover;
+}
+</style>
+</head>
+<body>
+<header class="container-fluid">
+<nav class="navbar navbar-expand-md navbar-dark">
+<div class="container">
+<a class="navbar-brand" href="/">Ozan Şelte</a>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ml-auto">
+
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" href="#" id="navbarDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Kategoriler</a>
+<div class="dropdown-menu" aria-labelledby="navbarDrop">
+<a class="dropdown-item" href="/programlama">Programlama</a><a class="dropdown-item" href="/genel">Genel</a><a class="dropdown-item" href="/linux">Linux</a><a class="dropdown-item" href="/c-ve-c++">C ve C++</a><a class="dropdown-item" href="/oyun-programlama">Oyun Programlama</a>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+<div class="text-center">
+<a href="/" title=""><img class="rounded mx-auto d-block" alt="" src="/images/site/ozanselte.png"></a><h1><a href="/" title="">Ozan Şelte</a><br><small>Mühendis Adayı</small></h1>
+</div>
+</header>
+<br>
+<div class="container"><div class="row">
+<article class="col-sm-12 text-justify">
+<h1>Godot Oyun Motoru'na Başlangıç<br><small>11 Ekim 2015 - 
+<a href="/programlama"><strong class="d-inline-block mb-2 mr-3" style="color: var(--blue);">Programlama</strong></a><a href="/oyun-programlama"><strong class="d-inline-block mb-2 mr-3" style="color: var(--red);">Oyun Programlama</strong></a></small></h1>
+<h2 id="godot-nedir">Godot Nedir?</h2>
+<p><a href="http://www.godotengine.org">Godot</a> <strong>Unity3D</strong> benzeri 2 ve 3 boyutlu bir oyun motorudur. Unity3D’ye çok benzer bir tasarımı vardır. Farklı olarak <strong>GDScript</strong> adlı <strong>Python</strong> benzeri bir script dili kullanılır ve <em>açık kaynak kodludur.</em></p>
+
+<p><img src="/images/posts/godot/0.jpg" alt="platformlar" class="img-fluid img-thumbnail" /></p>
+
+<h2 id="neden-godot">Neden Godot?</h2>
+<ul>
+  <li>Açık kaynak kodludur(MIT Lisansı)</li>
+  <li>Linux, OS X ve Windows destekler</li>
+  <li>Yazdığınız oyun kolayca diğer platformlarda çalışır:</li>
+  <li>Mobil: <strong>Android</strong>, <strong>iOS</strong></li>
+  <li>Masaüstü: <strong>Windows</strong>, <strong>OSX</strong>, <strong>Linux</strong></li>
+  <li><strong>Playstation 3</strong> ve <strong>Vita</strong> (Sony lisansı gerekli.)</li>
+  <li>Web: <strong>PNaCL</strong></li>
+  <li><strong>HTML5</strong> ve <strong>Windows Phone</strong> ile de uyumludur fakat yapımcılar henüz stabil olmadıklarını belirtiyorlar.</li>
+</ul>
+
+<h3 id="godota-giriş">Godot’a Giriş</h3>
+<p>Öncelikle Godot’un kurulması gerekiyor. Sitesinden(www.godotengine.org) kurabilirsiniz. Şimdi Godot’u açalım.</p>
+
+<p><img src="/images/posts/godot/1.jpg" alt="godot-projectManager" class="img-fluid img-thumbnail" /></p>
+
+<p>Eğer önceden projeniz varsa burada görünecektir. Herhangi bir proje indirdiyseniz <em>Import</em> diyerek burada görünmesini sağlayabilirsiniz. Henüz proje oluşturmadığımız için <em>New Project</em> diyerek devam ediyoruz.</p>
+
+<p><img src="/images/posts/godot/2.jpg" alt="godot-newProject" class="img-fluid img-thumbnail" /></p>
+
+<p><em>Browse</em> diyerek projemizin klasörünü seçiyoruz.<em>Open</em> ve sonrasında <em>Create</em> diyoruz.</p>
+
+<p><img src="/images/posts/godot/3.jpg" alt="godot-openDirectory" class="img-fluid img-thumbnail" /></p>
+
+<p>Yarattığımız projemizi seçip <em>Edit</em> diyerek o güzel penceremizi açıyoruz.</p>
+
+<p><img src="/images/posts/godot/4.jpg" alt="godot-Engine" class="img-fluid img-thumbnail" /></p>
+
+<h3 id="i̇lk-node">İlk Node</h3>
+<p>Şu an ana menünün içindeyiz. Sağ taraftan <em>Scene</em> tabını seçelim ve beyaz sayfaya tıklayarak(CTRL+A) yani <em>Node(Türkçe: düğüm)</em> ekleyelim. Ekleyeceğimiz nesnemizin türü <em>RichLabelText</em>, bunu ekrana yazı yazdırmak için kullanacağız. Nesnemizi bulalım ve <em>Create</em> diyelim.</p>
+
+<p><img src="/images/posts/godot/5.jpg" alt="godot-addNode" class="img-fluid img-thumbnail" /></p>
+
+<p>Oluşan nesnemize çift tıklayalım ve adını <em>helloWorld</em> koyalım.</p>
+
+<p><img src="/images/posts/godot/6.jpg" alt="godot-rename" class="img-fluid img-thumbnail" /></p>
+
+<p>Şimdi sağ üstteki simgeye tıklayarak <em>Script</em> ekleme işlemine koyulalım. Path butonu ile yeni klasör oluşturalım ve adını <em>Scripts</em> koyalım. Bu klasörün içinde <em>firstScript.gd</em> adıyla ilk scriptimizi oluşturalım.</p>
+
+<p><img src="/images/posts/godot/7.jpg" alt="godot-createScript" class="img-fluid img-thumbnail" /></p>
+
+<h3 id="i̇lk-script">İlk Script</h3>
+<blockquote>
+  <ul>
+    <li>Godot kendi içinde dökümanlarını barındırıyor. F1’e basarak bu dökümanlara ulaşabilirsiniz. Bu sayede oyun motorunun içindeki tüm fonkisonlara açıklamalarıyla birlikte ulaşabiliyoruz.</li>
+    <li>Eğer <strong>Python</strong> bilginiz yoksa daha önce oluşturduğum <a href="https://www.ozanselte.com/ucretsiz-turkce-programlama-egitimi-kaynaklari/#python">Türkçe Python Dersleri</a> istesi ile kendinizi geliştirebilirsiniz.</li>
+  </ul>
+</blockquote>
+
+<p>Proje çalıştığında başlatılacak olan fonksiyon <em>_ready</em> fonksiyonudur. Kodu yazıp CTRL+ALT+S ile scripti kaydediyor sonra CTRL+S diyoruz. Proje klasörümüze, ki bu klasör <em>Scripts</em> klasörümüzün üst klasörü oluyor, geçiyor ve <em>mainScene.scn</em> adıyla ilk sahnemizi kaydediyoruz.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="n">extends</span> <span class="n">RichTextLabel</span>
+
+<span class="n">func</span> <span class="n">_ready</span><span class="p">():</span>
+	<span class="bp">self</span><span class="o">.</span><span class="n">add_text</span><span class="p">(</span><span class="s">"Hello, World!"</span><span class="p">);</span>
+	<span class="k">pass</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<p><img src="/images/posts/godot/8.jpg" alt="godot-saveScene" class="img-fluid img-thumbnail" /></p>
+
+<p>Kaydettiğimize göre şimdi oyun motorumuza projemizin <em>mainScene</em> adlı sahne ile başlayacağını belirtmemiz gerekiyor. <strong>Scene » Project Settings</strong> yolunu izliyoruz. <strong>main_scene</strong> değerini karşısındaki tuş ile değiştiriyoruz ve <em>mainScene.scn</em> dosyamızı seçiyoruz.</p>
+
+<p><img src="/images/posts/godot/9.jpg" alt="godot-settings" class="img-fluid img-thumbnail" /></p>
+
+<p>Yukarıdaki başlatma tuşuyla(F5) birlikte projemizi çalıştırıyoruz.</p>
+
+<p><img src="/images/posts/godot/10.jpg" alt="godot-startProject" class="img-fluid img-thumbnail" /></p>
+
+<p>Menümüzden 2D tabına geçiyor ve <em>helloWorld</em> nesnemizi seçiyoruz. Kırmızı bir çerveme ile beliriyor bunu istediğimiz gibi boyutlandırabiliriz. Boyutlandırma <em>Inspector</em> sekmesinin <em>Margin</em> ve <em>Rect</em> bölümlerinden incelenebilir.</p>
+
+<h3 id="font-eklemek">Font Eklemek</h3>
+<p>Sol üstten <strong>Import » Font</strong> yolunu izliyoruz. Fontumuzu seçip boyutlandırmamızı yapıyoruz, <em>Fonts/firstFont.fnt</em> adını veriyoruz ve <em>Import</em> tuşuyla projemize ekliyoruz.</p>
+
+<p><img src="/images/posts/godot/11.jpg" alt="godot-addFont" class="img-fluid img-thumbnail" /></p>
+
+<p><em>helloWorld</em> düğümümüzün <em>Inspector</em> sekmesinden <strong>Custom Fonts » Normal Font</strong> değerini <em>Load</em> tuşu ile değiştiriyoruz ve yeni fontumuzu seçiyoruz. F5’e bastımızda değişiklik hemen belli oluyor.</p>
+
+<p><img src="/images/posts/godot/12.jpg" alt="godot-helloWorldFont" class="img-fluid img-thumbnail" /></p>
+
+<h3 id="zamanlayıcı-kullanmak">Zamanlayıcı Kullanmak</h3>
+<p>Zamanalayıcı(Timer) oyunlarda son derece sık kullanılan bir araçtır. Var olan projemize kolayca dahil edeceğiz. Hemen <em>Create Node</em> diyerek <em>Timer</em> ekliyoruz.
+Zamanlayıcımızın <em>Inspector</em> sekmesindeki <em>Wait Time</em> değeri saniye cinsinden bir değerdir ve bu değer zamanlayıcı fonksiyonumuzun hangi sıklıkla çalışacağını belirtir.<em>Autostart</em> değeri ise proje başladığında saymaya hemen başlayıp başlamamasına karar verir, hemen tik koyuyoruz.</p>
+
+<p><img src="/images/posts/godot/13.jpg" alt="godot-timerSettings" class="img-fluid img-thumbnail" /></p>
+
+<p>Sağ üstteki <em>Edit the Node Connections</em> tuşuna basıyoruz. <em>timeout()’u</em> seçiyoruz ve <em>Connect</em> diyoruz. <em>helloWorld</em> seçili iken tekrar <em>Connect’e</em> tıklayarak işlemi bitiriyoruz. <strong>_on_Timer_2_timeout()</strong> fonksiyonunu zamanlayıcımızın belirttiğimiz sıklıkla çalıştıracağı fonksiyon yaptık. İyi kötü yorumlarınızı ve gelecek yazılardan isteklerinizi bekliyorum. Okuduğunuz için teşekkürler.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="n">extends</span> <span class="n">RichTextLabel</span>
+
+<span class="n">var</span> <span class="n">saniye</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">func</span> <span class="n">_ready</span><span class="p">():</span>
+	<span class="bp">self</span><span class="o">.</span><span class="n">add_text</span><span class="p">(</span><span class="s">"Merhaba Dünya!"</span><span class="p">);</span>
+	<span class="k">pass</span>
+
+<span class="n">func</span> <span class="n">_on_Timer_2_timeout</span><span class="p">():</span>
+	<span class="n">saniye</span> <span class="o">+=</span> <span class="mi">1</span>
+	<span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+	<span class="bp">self</span><span class="o">.</span><span class="n">add_text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">saniye</span><span class="p">,</span> <span class="s">" saniye geçti."</span><span class="p">))</span>
+	<span class="k">pass</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<p><img src="/images/posts/godot/14.jpg" alt="godot-countSeconds" class="img-fluid img-thumbnail" /></p>
+
+</article>
+<div class="col-sm-12">
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {this.page.url = 'https://www.ozanselte.com/godot-oyun-motoruna-baslangic/';};
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://ozanselte.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div></div>
+<footer class="container mb-3">
+<div class="row">
+<div class="col text-center"><a class="nav-link" href="https://github.com/ozanselte"><i class="fab fa-github fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.facebook.com/ozanselte"><i class="fab fa-facebook fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://twitter.com/ozanselte"><i class="fab fa-twitter fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.instagram.com/ozanselte"><i class="fab fa-instagram fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.linkedin.com/in/ozanselte"><i class="fab fa-linkedin fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://t.me/ozanselte"><i class="fab fa-telegram fa-lg"></i> ozanselte</a></div>
+</div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '');
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+</body>
+</html>

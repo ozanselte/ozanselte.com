@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="">
+<link rel='icon' type='image/x-icon' href='/images/site/favicon.ico'>
+<title>LFS 1 - Geçici Sistem Oluşturma</title>
+<meta name="description" content="Sıra geçici sistemi oluşturup derlemeye geldi. Geçici sistem bizim asıl LFS sistemimizin içindeki programları yani aslında LFS sisteminin kendisini derleyece...">
+<link rel="canonical" href="https://www.ozanselte.com//lfs-1-gecici-sistem-olusturma/">
+<meta name="keywords" content=", , , , ">
+<meta name="referrer" content="origin">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link href="/assets/css/style.css" rel="stylesheet">
+<style>
+header {
+background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.25)), url("/images/post_covers/human_network.jpg") no-repeat scroll center center / cover;
+}
+</style>
+</head>
+<body>
+<header class="container-fluid">
+<nav class="navbar navbar-expand-md navbar-dark">
+<div class="container">
+<a class="navbar-brand" href="/">Ozan Şelte</a>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ml-auto">
+
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" href="#" id="navbarDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Kategoriler</a>
+<div class="dropdown-menu" aria-labelledby="navbarDrop">
+<a class="dropdown-item" href="/programlama">Programlama</a><a class="dropdown-item" href="/genel">Genel</a><a class="dropdown-item" href="/linux">Linux</a><a class="dropdown-item" href="/c-ve-c++">C ve C++</a><a class="dropdown-item" href="/oyun-programlama">Oyun Programlama</a>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+<div class="text-center">
+<a href="/" title=""><img class="rounded mx-auto d-block" alt="" src="/images/site/ozanselte.png"></a><h1><a href="/" title="">Ozan Şelte</a><br><small>Mühendis Adayı</small></h1>
+</div>
+</header>
+<br>
+<div class="container"><div class="row">
+<article class="col-sm-12 text-justify">
+<h1>LFS 1 - Geçici Sistem Oluşturma<br><small>9 Ağustos 2015 - 
+<a href="/linux"><strong class="d-inline-block mb-2 mr-3" style="color: var(--purple);">Linux</strong></a></small></h1>
+<p>Sıra geçici sistemi oluşturup derlemeye geldi. Geçici sistem bizim asıl LFS sistemimizin içindeki programları yani aslında LFS sisteminin kendisini derleyeceğimiz araçlardan oluşuyor. Önce geçici sistemi oluşturacak sonra o sistemin içine girip asıl sistemi oluşturacağız.
+Şimdi derlenecek dosyalarımızı indirip bunları derlemeye başlayabiliriz. Önce kaynak kodlarımızı indireceğiz ki bu konuda bize kolaylık olsun diye liste yapmışlar <em>wget</em> hemen halledecek. Sonra da bunları doğrulayacağız, isteyen doğrulamayabilir ama sonuçta sistem derliyoruz ve hatalı bir şey olursa sonra diğerleri de derlenmez, işin içinden çıkamayız.
+İlk olarak asıl sistemi derleyecek olan geçici sistem programlarını derleyeceğiz. Emin olun çok zevkli.</p>
+
+<h3 id="paketleri-hazırlamak">Paketleri hazırlamak</h3>
+<ul>
+  <li>İlk olarak <em>$LFS</em> klasörümüze giriyoruz. Tabii ki önceden <em>mount</em> ettiniz bunları konuşmayalım.</li>
+  <li>Başkaları dokunmasın diye klasör yetkilerini düzenliyoruz.</li>
+  <li>Kaynak kodlarımızı indiriyoruz.</li>
+  <li>İndirdiğimiz paketleri <em>md5sum</em> ile kontrol ediyoruz.</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>
+mkdir <span class="nt">-v</span> <span class="nv">$LFS</span>/sources
+chmod <span class="nt">-v</span> a+wt <span class="nv">$LFS</span>/sources
+wget http://www.linuxfromscratch.org/lfs/view/stable/wget-list
+wget <span class="nt">--input-file</span><span class="o">=</span>wget-list <span class="nt">--continue</span> <span class="nt">--directory-prefix</span><span class="o">=</span><span class="nv">$LFS</span>/sources
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+wget http://www.linuxfromscratch.org/lfs/view/stable/md5sums
+md5sum <span class="nt">-c</span> md5sums
+<span class="nb">cd</span> <span class="nv">$LFS</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Evet. İndirdik, düzenledik, açtık, kontrol ettik. Açılışımız güzel oldu. Sıra geldi diğer klasörümüzü oluşturmaya. Bu bizim paketleri derleyeceğimiz klasör olacak onun için kök klasörümüze sembolik köprü oluşturacağız.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="code"><pre>mkdir <span class="nt">-v</span> <span class="nv">$LFS</span>/tools
+ln <span class="nt">-sv</span> <span class="nv">$LFS</span>/tools /</pre></td></tr></tbody></table></code></pre></figure>
+
+<h3 id="kullanıcı-oluşturmak">Kullanıcı oluşturmak</h3>
+<p>Şu ana kadar her şeyi <em>root</em> olarak yaptık. Fakat artık iş derlemeye ve kurmaya geldi. Yapacağımız bir hata kendi kullandığımız sisteme zarar verebilir. Bu konuda herkesin düşüneceği gibi gurularımız yeni bir grup ve kullanıcı oluşturmayı uygun görmüşler.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="code"><pre>groupadd lfs
+useradd <span class="nt">-s</span> /bin/bash <span class="nt">-g</span> lfs <span class="nt">-m</span> <span class="nt">-k</span> /dev/null lfs
+passwd lfs
+chown <span class="nt">-v</span> lfs <span class="nv">$LFS</span>/tools
+chown <span class="nt">-v</span> lfs <span class="nv">$LFS</span>/sources
+su - lfs</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Daha önce bu işlemleri yapmamış olanlar için açıklayayım:</p>
+
+<ul>
+  <li><strong>groupadd</strong> <em>lfs</em> adında bir grup oluşturuyoruz.</li>
+  <li><strong>useradd</strong> yine aynı isimde bir kullanıcı oluşturuyoruz.</li>
+  <li><strong>-s /bin/bash</strong> <em>lfs</em> kullanıcısının kabuğunu <strong>bash</strong> olarak seçiyoruz.</li>
+  <li><strong>-g lfs</strong> kullanıcımızı <em>lfs</em> grubuna ekliyoruz.</li>
+  <li><strong>-m</strong> <em>lfs</em> kullanıcımıza ev(home) klasörü oluşturuyoruz.</li>
+  <li><strong>-k /dev/null</strong> kullanıcımızın iskelet(skeleton) klasörü olarak sistem varsayılanını kullanmamasını sağlıyoruz.</li>
+  <li><strong>passwd</strong> kullanıcımızın şifresini belirliyoruz. İstediğinizi yazabilirsiniz.</li>
+  <li><strong>chown</strong> <em>$LFS</em> klasörlerimizin sahibini <em>lfs</em> kullanıcımız yapıyoruz.</li>
+  <li><strong>su</strong> <em>root</em> kullanıcımızdan <em>lfs</em> kullanıcımıza geçiyoruz.</li>
+</ul>
+
+<p>LFS yazarlarımız bununla kalmamışlar bizim işimizi kolaylaştırmak için birer komutla bizim <em>dot files</em> dediğimiz dosyaları da oluşturmuşlar.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="code"><pre><span class="nb">cat</span> <span class="o">&gt;</span> ~/.bash_profile &lt;&lt; <span class="s2">"EOF"</span>
+<span class="nb">exec </span>env <span class="nt">-i</span> <span class="nv">HOME</span><span class="o">=</span><span class="nv">$HOME</span> <span class="nv">TERM</span><span class="o">=</span><span class="nv">$TERM</span> <span class="nv">PS1</span><span class="o">=</span><span class="s1">'\u:\w\$ '</span> /bin/bash
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="nb">cat</span> <span class="o">&gt;</span> ~/.bashrc &lt;&lt; <span class="s2">"EOF"</span>
+<span class="nb">set</span> +h
+<span class="nb">umask </span>022
+<span class="nv">LFS</span><span class="o">=</span>/mnt/lfs
+<span class="nv">LC_ALL</span><span class="o">=</span>POSIX
+<span class="nv">LFS_TGT</span><span class="o">=</span><span class="k">$(</span>uname <span class="nt">-m</span><span class="k">)</span><span class="nt">-lfs-linux-gnu</span>
+<span class="nv">PATH</span><span class="o">=</span>/tools/bin:/bin:/usr/bin
+<span class="nb">export </span>LFS LC_ALL LFS_TGT PATH
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<blockquote>
+  <p>Eğer siz <em>$LFS</em> olarak başka bir yer belirtiyorsanız bu ~/.bashrc dosyanızı düzenleyin.</p>
+</blockquote>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="c"># Eğer işlemcinizin çekirdek sayısı birden fazlaysa ~/.bashrc dosyanıza</span>
+<span class="nb">export </span><span class="nv">MAKEFLAGS</span><span class="o">=</span><span class="s1">'-j /çekirdeksayınız/'</span>
+<span class="c"># çift çekirde için örnek:</span>
+<span class="nb">export </span><span class="nv">MAKEFLAGS</span><span class="o">=</span><span class="s1">'-j 2'</span>
+<span class="c"># satırını eklemeniz hızınıza hız katar.</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+</pre></td><td class="code"><pre><span class="nb">source</span> ~/.bash_profile</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Şimdi de oluşturduğumuz dosyaları aktifleştirmiş olduk.</p>
+
+<h4 id="derleme-sürelerisbu">Derleme süreleri(SBU)</h4>
+<p>Kitabımız SBU diye bir terimden bahsediyor. Diyor ki derleme süreleri her makinede değişir, ben senin makineni bilemem. Ama diyor ilk derleyeceğin paket <em>Binutils-2.25</em> bunun derlenme süresine <strong>1 SBU</strong> dersen ben sana diğer paketlerin kaç SBU sürede derleneceğini söylerim.
+Biz de bu sebeple ilk paketin derlenme süresini hesaplayacağız.</p>
+
+<h3 id="kontroller">Kontroller</h3>
+<p>LFS gurularımızın bizi uyardığı bazı noktalar var. Hemen onları kontrol edelim.</p>
+
+<ul>
+  <li><em>$LFS</em> değişkeninin kurulum dizinini(/mnt/lfs) işaret ettiğine emin olun.</li>
+  <li>Kabuk olarak <em>bash</em> kullandığınızdan emin olun.</li>
+  <li><em>sh</em> komutunun <em>bash</em> komutunu çağırdığından emin olun.</li>
+  <li><em>/usr/bin/awk</em> komutunun <em>gawk</em> komutunu çağırdığından emin olun</li>
+  <li><em>/usr/bin/yacc</em> komutunun <em>bison</em> komutunu çağırdığından emin olun.</li>
+</ul>
+
+<p>Yaklaşık olarak istisnalar hariç tüm kurulumlar aşağıdaki yolu izleyecektir. Öğrenmek hataları minimuma çekecektir bu yüzden yazıyorum.</p>
+
+<ul>
+  <li>Paket <em>tar</em> ile açılır.</li>
+  <li>Paketin çıkartıldığı dizine girilir.</li>
+  <li>Kitaptaki anlatımlar izlenir.(Genelde <em>configure</em>, <em>make</em>, <em>make install</em> üçlüsü)</li>
+  <li>Dizinden çıkılır.</li>
+  <li>Paketin kaynak dizini ve varsa <strong>build</strong> dizini silinir.</li>
+</ul>
+
+<h2 id="derlemeye-başlangıç">Derlemeye başlangıç</h2>
+<p>Şu andan itibaren kesinlik <em>lfs</em> kullanıcı olarak <em>$LFS/sources/</em> dizininde olmalısınız. Kalkışa hazır olun.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="code"><pre>su - lfs
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="binutils1aşama">Binutils(1.Aşama)</h4>
+<p>Derleme süresi: 1 SBU, Gerekli disk alanı: 545 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+<span class="nb">tar </span>xvf binutils-2.25.tar.bz2
+<span class="nb">cd </span>binutils-2.25
+mkdir <span class="nt">-v</span> ../binutils-build
+<span class="nb">cd</span> ../binutils-build</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>binutils paketimiz özel durumu olanlardan. Bu yüzden build klasörüne ihtiyaç duyuyor.
+SBU hesaplarımızı bu paket ile yapacağımız söylemiştik. <em>time</em> komutunu biliyorsunuzdur. Az sonra imdadımıza yetişecek.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="code"><pre><span class="c"># 32-bit</span>
+<span class="nb">time</span> <span class="o">{</span> ../binutils-2.25/configure <span class="nt">--prefix</span><span class="o">=</span>/tools <span class="nt">--with-sysroot</span><span class="o">=</span><span class="nv">$LFS</span> <span class="nt">--with-lib-path</span><span class="o">=</span>/tools/lib <span class="nt">--target</span><span class="o">=</span><span class="nv">$LFS_TGT</span> <span class="nt">--disable-nls</span> <span class="nt">--disable-werror</span> <span class="o">&amp;&amp;</span> make <span class="o">&amp;&amp;</span> make install<span class="p">;</span> <span class="o">}</span>
+
+<span class="c"># 64-bit</span>
+<span class="nb">time</span> <span class="o">{</span> ../binutils-2.25/configure <span class="nt">--prefix</span><span class="o">=</span>/tools <span class="nt">--with-sysroot</span><span class="o">=</span><span class="nv">$LFS</span> <span class="nt">--with-lib-path</span><span class="o">=</span>/tools/lib <span class="nt">--target</span><span class="o">=</span><span class="nv">$LFS_TGT</span> <span class="nt">--disable-nls</span> <span class="nt">--disable-werror</span> <span class="o">&amp;&amp;</span> make <span class="o">&amp;&amp;</span> mkdir <span class="nt">-v</span> /tools/lib <span class="o">&amp;&amp;</span> ln <span class="nt">-sv</span> lib /tools/lib64 <span class="o">&amp;&amp;</span> make install<span class="p">;</span> <span class="o">}</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<p><em>time</em> komutu sonrası karşımıza çıkan <strong>real</strong> değeri bizim SBU’muz olmuş oluyor. Artık hangi paket ne kadar sürede derlenecek az çok biliyoruz.
+Benim için 1 SBU = 1dakika 5saniye</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="code"><pre>real    1m5.023s
+user    1m39.480s
+sys     0m13.000s</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>İlk programımız <em>/tools</em> dizinimize derlendi. Kontrol edebilirsiniz.
+Şimdi işimize yaramayan klasörleri silebiliriz.</p>
+<blockquote>
+  <p>Kesinlikle arşiv dosyalarını silmeyin.</p>
+</blockquote>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="code"><pre><span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> binutils-2.25/
+rm <span class="nt">-rf</span> binutils-build/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="gcc1aşama">GCC(1.Aşama)</h4>
+<p>Derleme süresi: 5.9 SBU, Gerekli disk alanı: 2 GB</p>
+
+<p>GCC kurulumu biraz daha uzun karmaşık. Sonuçta daha kompleks bir yapısı var çok sinirlenmeden normal karşılayalım, biraz alttan alalım.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+</pre></td><td class="code"><pre><span class="c"># hazırlığımızı yapıyoruz</span>
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+<span class="nb">tar</span> <span class="nt">-xvf</span> gcc-4.9.2.tar.bz2
+<span class="nb">cd </span>gcc-4.9.2
+<span class="nb">tar</span> <span class="nt">-xvf</span> ../mpfr-3.1.2.tar.xz
+mv <span class="nt">-v</span> mpfr-3.1.2 mpfr
+<span class="nb">cd </span>mpfr
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../../mpfr-3.1.2-upstream_fixes-3.patch
+<span class="nb">cd</span> ..
+<span class="nb">tar</span> <span class="nt">-xvf</span> ../gmp-6.0.0a.tar.xz
+mv <span class="nt">-v</span> gmp-6.0.0 gmp
+<span class="nb">tar</span> <span class="nt">-xvf</span> ../mpc-1.0.2.tar.gz
+mv <span class="nt">-v</span> mpc-1.0.2 mpc
+
+<span class="k">for </span>file <span class="k">in</span> <span class="se">\</span>
+ <span class="k">$(</span>find gcc/config <span class="nt">-name</span> linux64.h <span class="nt">-o</span> <span class="nt">-name</span> linux.h <span class="nt">-o</span> <span class="nt">-name</span> sysv4.h<span class="k">)</span>
+<span class="k">do
+  </span>cp <span class="nt">-uv</span> <span class="nv">$file</span><span class="o">{</span>,.orig<span class="o">}</span>
+  sed <span class="nt">-e</span> <span class="s1">'s@/lib\(64\)\?\(32\)\?/ld@/tools&amp;@g'</span> <span class="se">\</span>
+      <span class="nt">-e</span> <span class="s1">'s@/usr@/tools@g'</span> <span class="nv">$file</span>.orig <span class="o">&gt;</span> <span class="nv">$file</span>
+  <span class="nb">echo</span> <span class="s1">'
+#undef STANDARD_STARTFILE_PREFIX_1
+#undef STANDARD_STARTFILE_PREFIX_2
+#define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
+#define STANDARD_STARTFILE_PREFIX_2 ""'</span> <span class="o">&gt;&gt;</span> <span class="nv">$file</span>
+  touch <span class="nv">$file</span>.orig
+<span class="k">done
+
+</span>sed <span class="nt">-i</span> <span class="s1">'/k prot/agcc_cv_libc_provides_ssp=yes'</span> gcc/configure
+
+<span class="c"># Daha yeni derlemeye başlıyoruz, az daha sabır.</span>
+mkdir <span class="nt">-v</span> ../gcc-build
+<span class="nb">cd</span> ../gcc-build
+../gcc-4.9.2/configure                               <span class="se">\</span>
+    <span class="nt">--target</span><span class="o">=</span><span class="nv">$LFS_TGT</span>                                <span class="se">\</span>
+    <span class="nt">--prefix</span><span class="o">=</span>/tools                                  <span class="se">\</span>
+    <span class="nt">--with-sysroot</span><span class="o">=</span><span class="nv">$LFS</span>                              <span class="se">\</span>
+    <span class="nt">--with-newlib</span>                                    <span class="se">\</span>
+    <span class="nt">--without-headers</span>                                <span class="se">\</span>
+    <span class="nt">--with-local-prefix</span><span class="o">=</span>/tools                       <span class="se">\</span>
+    <span class="nt">--with-native-system-header-dir</span><span class="o">=</span>/tools/include   <span class="se">\</span>
+    <span class="nt">--disable-nls</span>                                    <span class="se">\</span>
+    <span class="nt">--disable-shared</span>                                 <span class="se">\</span>
+    <span class="nt">--disable-multilib</span>                               <span class="se">\</span>
+    <span class="nt">--disable-decimal-float</span>                          <span class="se">\</span>
+    <span class="nt">--disable-threads</span>                                <span class="se">\</span>
+    <span class="nt">--disable-libatomic</span>                              <span class="se">\</span>
+    <span class="nt">--disable-libgomp</span>                                <span class="se">\</span>
+    <span class="nt">--disable-libitm</span>                                 <span class="se">\</span>
+    <span class="nt">--disable-libquadmath</span>                            <span class="se">\</span>
+    <span class="nt">--disable-libsanitizer</span>                           <span class="se">\</span>
+    <span class="nt">--disable-libssp</span>                                 <span class="se">\</span>
+    <span class="nt">--disable-libvtv</span>                                 <span class="se">\</span>
+    <span class="nt">--disable-libcilkrts</span>                             <span class="se">\</span>
+    <span class="nt">--disable-libstdc</span>++-v3                           <span class="se">\</span>
+    <span class="nt">--enable-languages</span><span class="o">=</span>c,c++
+make
+make install
+
+<span class="c"># fazlalıklarımızı siliyoruz</span>
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> gcc-4.9.2/
+rm <span class="nt">-rf</span> gcc-build/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="linux-api-headers">Linux API Headers</h4>
+<p>Derleme süresi: 0.1 SBU, Gerekli disk alanı: 653 MB</p>
+
+<p>Basit bir API kopyalama o yüzden kısa çok da fazla sevinmeyin.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="c"># paketi açıyoruz</span>
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+<span class="nb">tar</span> <span class="nt">-xvf</span> linux-3.19.tar.xz
+<span class="nb">cd </span>linux-3.19
+
+<span class="c"># kuruyoruz</span>
+make mrproper
+make <span class="nv">INSTALL_HDR_PATH</span><span class="o">=</span>dest headers_install
+cp <span class="nt">-rv</span> dest/include/<span class="k">*</span> /tools/include
+
+<span class="c"># siliyoruz</span>
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> linux-3.19/</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="glibc">Glibc</h4>
+<p>Derleme süresi: 3.9 SBU, Gerekli disk alanı: 670 MB</p>
+
+<p>Basit bir API kopyalama o yüzden kısa çok da fazla sevinmeyin.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+</pre></td><td class="code"><pre><span class="c"># paketi açıyoruz</span>
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+<span class="nb">tar</span> <span class="nt">-xvf</span> glibc-2.21.tar.xz
+<span class="nb">cd </span>glibc-2.21
+patch <span class="nt">-Np1</span> <span class="nt">-i</span> ../glibc-2.21-fhs-1.patch
+
+<span class="c"># gurularımız olası sorunlara karşı önlemler sunmuşlar.</span>
+<span class="c"># aşılarımızı yapıyoruz</span>
+<span class="k">if</span> <span class="o">[</span> <span class="o">!</span> <span class="nt">-r</span> /usr/include/rpc/types.h <span class="o">]</span><span class="p">;</span> <span class="k">then
+  </span>su <span class="nt">-c</span> <span class="s1">'mkdir -pv /usr/include/rpc'</span>
+  su <span class="nt">-c</span> <span class="s1">'cp -v sunrpc/rpc/*.h /usr/include/rpc'</span>
+<span class="k">fi
+
+</span>sed <span class="nt">-e</span> <span class="s1">'/ia32/s/^/1:/'</span> <span class="se">\</span>
+    <span class="nt">-e</span> <span class="s1">'/SSE2/s/^1://'</span> <span class="se">\</span>
+    <span class="nt">-i</span>  sysdeps/i386/i686/multiarch/mempcpy_chk.S
+
+<span class="c"># kurulumu hazırlıyoruz</span>
+mkdir <span class="nt">-v</span> ../glibc-build
+<span class="nb">cd</span> ../glibc-build
+
+<span class="c"># kuruyoruz</span>
+../glibc-2.21/configure                             <span class="se">\</span>
+      <span class="nt">--prefix</span><span class="o">=</span>/tools                               <span class="se">\</span>
+      <span class="nt">--host</span><span class="o">=</span><span class="nv">$LFS_TGT</span>                               <span class="se">\</span>
+      <span class="nt">--build</span><span class="o">=</span><span class="k">$(</span>../glibc-2.21/scripts/config.guess<span class="k">)</span> <span class="se">\</span>
+      <span class="nt">--disable-profile</span>                             <span class="se">\</span>
+      <span class="nt">--enable-kernel</span><span class="o">=</span>2.6.32                        <span class="se">\</span>
+      <span class="nt">--with-headers</span><span class="o">=</span>/tools/include                 <span class="se">\</span>
+      <span class="nv">libc_cv_forced_unwind</span><span class="o">=</span>yes                     <span class="se">\</span>
+      <span class="nv">libc_cv_ctors_header</span><span class="o">=</span>yes                      <span class="se">\</span>
+      <span class="nv">libc_cv_c_cleanup</span><span class="o">=</span>yes
+make <span class="nt">-j1</span><span class="c">#glibc çok çekirdek ile derlenmeyi pek sevmiyormuş</span>
+make install
+
+<span class="c"># siliyoruz</span>
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> glibc-2.21/
+rm <span class="nt">-rf</span> glibc-build/</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Gurularımız diyorlar ki; o kadar kurdun ya sorun varsa? Kontrol et diyorlar, kontrol et. Edelim ama nasıl?</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="nb">echo</span> <span class="s1">'main(){}'</span> <span class="o">&gt;</span> dummy.c
+<span class="nv">$LFS_TGT</span><span class="nt">-gcc</span> dummy.c
+readelf <span class="nt">-l</span> a.out | <span class="nb">grep</span> <span class="s1">': /tools'</span>
+
+<span class="c"># aşağdakine benzer bir çıktı almamız gerekiyor /tools/lib yerine /tools/lib64 de olabilir</span>
+<span class="o">[</span>Requesting program interpreter: /tools/lib/ld-linux.so.2]
+<span class="c"># bu çıktıyı alamıyorsak sorun var demektir</span>
+<span class="c"># dosyayı silelim fazlalık yapmasın</span>
+rm <span class="nt">-v</span> dummy.c a.out</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="libstdc">Libstdc++</h4>
+<p>Derleme süresi: 0.3 SBU, Gerekli disk alanı: 798 MB</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="code"><pre><span class="c"># paketi açıyoruz</span>
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+<span class="nb">tar</span> <span class="nt">-xvf</span> gcc-4.9.2.tar.bz2
+<span class="nb">cd </span>gcc-4.9.2
+mkdir <span class="nt">-pv</span> ../gcc-build
+<span class="nb">cd</span> ../gcc-build
+
+<span class="c"># kuruyoruz</span>
+../gcc-4.9.2/libstdc++-v3/configure <span class="se">\</span>
+    <span class="nt">--host</span><span class="o">=</span><span class="nv">$LFS_TGT</span>                 <span class="se">\</span>
+    <span class="nt">--prefix</span><span class="o">=</span>/tools                 <span class="se">\</span>
+    <span class="nt">--disable-multilib</span>              <span class="se">\</span>
+    <span class="nt">--disable-shared</span>                <span class="se">\</span>
+    <span class="nt">--disable-nls</span>                   <span class="se">\</span>
+    <span class="nt">--disable-libstdcxx-threads</span>     <span class="se">\</span>
+    <span class="nt">--disable-libstdcxx-pch</span>         <span class="se">\</span>
+    <span class="nt">--with-gxx-include-dir</span><span class="o">=</span>/tools/<span class="nv">$LFS_TGT</span>/include/c++/4.9.2
+make
+make install
+
+<span class="c"># siliyoruz</span>
+<span class="nb">cd</span> <span class="nv">$LFS</span>/sources
+rm <span class="nt">-rf</span> gcc-4.9.2/
+rm <span class="nt">-rf</span> gcc-build/</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Tüm parametrelerin açıklamalarını bir bir yazmıyorum hem tümünü kendim de bilmiyorum hem de zaten hepsi LFS kitabında yazıyor. Geçici sistemin temellerini başarıyla derledik.</p>
+
+</article>
+<div class="col-sm-12">
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {this.page.url = 'https://www.ozanselte.com/lfs-1-gecici-sistem-olusturma/';};
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://ozanselte.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div></div>
+<footer class="container mb-3">
+<div class="row">
+<div class="col text-center"><a class="nav-link" href="https://github.com/ozanselte"><i class="fab fa-github fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.facebook.com/ozanselte"><i class="fab fa-facebook fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://twitter.com/ozanselte"><i class="fab fa-twitter fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.instagram.com/ozanselte"><i class="fab fa-instagram fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.linkedin.com/in/ozanselte"><i class="fab fa-linkedin fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://t.me/ozanselte"><i class="fab fa-telegram fa-lg"></i> ozanselte</a></div>
+</div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '');
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+</body>
+</html>

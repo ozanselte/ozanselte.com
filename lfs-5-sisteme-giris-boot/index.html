@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="">
+<link rel='icon' type='image/x-icon' href='/images/site/favicon.ico'>
+<title>LFS 5 - Sisteme Giriş(Boot)</title>
+<meta name="description" content="Kalan derlemeleri de yapıp sistemimize girebiliriz.">
+<link rel="canonical" href="https://www.ozanselte.com//lfs-5-sisteme-giris-boot/">
+<meta name="keywords" content=", , , , ">
+<meta name="referrer" content="origin">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link href="/assets/css/style.css" rel="stylesheet">
+<style>
+header {
+background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.25)), url("/images/post_covers/fireworks.jpg") no-repeat scroll center center / cover;
+}
+</style>
+</head>
+<body>
+<header class="container-fluid">
+<nav class="navbar navbar-expand-md navbar-dark">
+<div class="container">
+<a class="navbar-brand" href="/">Ozan Şelte</a>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ml-auto">
+
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" href="#" id="navbarDrop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Kategoriler</a>
+<div class="dropdown-menu" aria-labelledby="navbarDrop">
+<a class="dropdown-item" href="/programlama">Programlama</a><a class="dropdown-item" href="/genel">Genel</a><a class="dropdown-item" href="/linux">Linux</a><a class="dropdown-item" href="/c-ve-c++">C ve C++</a><a class="dropdown-item" href="/oyun-programlama">Oyun Programlama</a>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+<div class="text-center">
+<a href="/" title=""><img class="rounded mx-auto d-block" alt="" src="/images/site/ozanselte.png"></a><h1><a href="/" title="">Ozan Şelte</a><br><small>Mühendis Adayı</small></h1>
+</div>
+</header>
+<br>
+<div class="container"><div class="row">
+<article class="col-sm-12 text-justify">
+<h1>LFS 5 - Sisteme Giriş(Boot)<br><small>21 Ağustos 2015 - 
+<a href="/linux"><strong class="d-inline-block mb-2 mr-3" style="color: var(--purple);">Linux</strong></a></small></h1>
+<p>Kalan derlemeleri de yapıp sistemimize girebiliriz.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre>mount <span class="nt">-v</span> <span class="nt">--bind</span> /dev <span class="nv">$LFS</span>/dev  
+mount <span class="nt">-vt</span> devpts devpts <span class="nv">$LFS</span>/dev/pts <span class="nt">-o</span> <span class="nv">gid</span><span class="o">=</span>5,mode<span class="o">=</span>620  
+mount <span class="nt">-vt</span> proc proc <span class="nv">$LFS</span>/proc  
+mount <span class="nt">-vt</span> sysfs sysfs <span class="nv">$LFS</span>/sys  
+mount <span class="nt">-vt</span> tmpfs tmpfs <span class="nv">$LFS</span>/run
+
+chroot <span class="s2">"</span><span class="nv">$LFS</span><span class="s2">"</span> /usr/bin/env <span class="nt">-i</span>              <span class="se">\ </span> 
+	<span class="nv">HOME</span><span class="o">=</span>/root <span class="nv">TERM</span><span class="o">=</span><span class="s2">"</span><span class="nv">$TERM</span><span class="s2">"</span> <span class="nv">PS1</span><span class="o">=</span><span class="s1">'\u:\w\$ '</span> <span class="se">\</span>
+	<span class="nv">PATH</span><span class="o">=</span>/bin:/usr/bin:/sbin:/usr/sbin     <span class="se">\</span>
+	/bin/bash <span class="nt">--login</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="lfs-bootscripts">LFS-Bootscripts</h4>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources
+<span class="nb">tar </span>xvf lfs-bootscripts-20150222.tar.bz2
+<span class="nb">cd </span>lfs-bootscripts-20150222
+
+make install
+<span class="nb">cd</span> /sources
+rm <span class="nt">-rf</span> lfs-bootscripts-20150222</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="cihazlar">Cihazlar</h4>
+<p>Burada cihazlarla ilgili bazı işlemler yapılıyor.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="code"><pre>bash /lib/udev/init-net-rules.sh
+<span class="nb">cat</span> /etc/udev/rules.d/70-persistent-net.rules
+
+udevadm <span class="nb">test</span> /sys/block/hdd
+sed <span class="nt">-i</span> <span class="nt">-e</span> <span class="s1">'s/"write_cd_rules"/"write_cd_rules mode"/'</span> <span class="se">\</span>
+    /etc/udev/rules.d/83-cdrom-symlinks.rules
+
+udevadm info <span class="nt">-a</span> <span class="nt">-p</span> /sys/class/video4linux/video0
+<span class="nb">cat</span> <span class="o">&gt;</span> /etc/udev/rules.d/83-duplicate_devs.rules &lt;&lt; <span class="s2">"EOF"</span>
+
+<span class="c"># Persistent symlinks for webcam and tuner</span>
+<span class="nv">KERNEL</span><span class="o">==</span><span class="s2">"video*"</span>, ATTRS<span class="o">{</span>idProduct<span class="o">}==</span><span class="s2">"1910"</span>, ATTRS<span class="o">{</span>idVendor<span class="o">}==</span><span class="s2">"0d81"</span>, <span class="se">\</span>
+    SYMLINK+<span class="o">=</span><span class="s2">"webcam"</span>
+<span class="nv">KERNEL</span><span class="o">==</span><span class="s2">"video*"</span>, ATTRS<span class="o">{</span>device<span class="o">}==</span><span class="s2">"0x036f"</span>, ATTRS<span class="o">{</span>vendor<span class="o">}==</span><span class="s2">"0x109e"</span>, <span class="se">\</span>
+    SYMLINK+<span class="o">=</span><span class="s2">"tvtuner"</span>
+
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="ağ-bağlantısı-ayarları">Ağ bağlantısı ayarları</h4>
+<p>Zaten buraları biliyorsunuz <strong>iface</strong> kısmına ne yazacağınıza <em>ifconfig</em> ile bakabilirsiniz. Gerisi normal statik ip ayarları. Henüz <strong>dhcp</strong> kurulumu yapmadık.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="code"><pre><span class="nb">cd</span> /etc/sysconfig/
+<span class="nb">cat</span> <span class="o">&gt;</span> ifconfig.eth0 &lt;&lt; <span class="s2">"EOF"</span>
+<span class="nv">ONBOOT</span><span class="o">=</span>yes
+<span class="nv">IFACE</span><span class="o">=</span>eth0
+<span class="nv">SERVICE</span><span class="o">=</span>ipv4-static
+<span class="nv">IP</span><span class="o">=</span>192.168.1.2
+<span class="nv">GATEWAY</span><span class="o">=</span>192.168.1.1
+<span class="nv">PREFIX</span><span class="o">=</span>24
+<span class="nv">BROADCAST</span><span class="o">=</span>192.168.1.255
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="resolvconf">resolv.conf</h4>
+<p><strong>nameserver</strong> DNS gireceğiniz bölüm, <strong>domain</strong> sizin alan adınız.</p>
+
+<p><em>Google: 8.8.8.8, 8.8.4.4</em></p>
+
+<p><em>OpenNIC: 217.12.203.133, 31.171.155.107</em></p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="nb">cat</span> <span class="o">&gt;</span> /etc/resolv.conf &lt;&lt; <span class="s2">"EOF"</span>
+<span class="c"># Begin /etc/resolv.conf</span>
+
+domain &lt;Your Domain Name&gt;
+nameserver &lt;IP address of your primary nameserver&gt;
+nameserver &lt;IP address of your secondary nameserver&gt;
+
+<span class="c"># End /etc/resolv.conf</span>
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="hosts">hosts</h4>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="code"><pre><span class="c"># &lt;lfs&gt; yerine kendi bilgisayar adınızı yazacaksınız</span>
+<span class="nb">echo</span> <span class="s2">"&lt;lfs&gt;"</span> <span class="o">&gt;</span> /etc/hostname
+
+<span class="nb">cat</span> <span class="o">&gt;</span> /etc/hosts &lt;&lt; <span class="s2">"EOF"</span>
+<span class="c"># Begin /etc/hosts (network card version)</span>
+
+127.0.0.1 localhost
+<span class="c"># &lt;192.168.1.1&gt; &lt;HOSTNAME.example.org&gt; [alias1] [alias2 ...]</span>
+
+<span class="c"># End /etc/hosts (network card version)</span>
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="inittab">inittab</h4>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+</pre></td><td class="code"><pre><span class="nb">cat</span> <span class="o">&gt;</span> /etc/inittab &lt;&lt; <span class="s2">"EOF"</span>
+<span class="c"># Begin /etc/inittab</span>
+
+id:3:initdefault:
+
+si::sysinit:/etc/rc.d/init.d/rc S
+
+l0:0:wait:/etc/rc.d/init.d/rc 0
+l1:S1:wait:/etc/rc.d/init.d/rc 1
+l2:2:wait:/etc/rc.d/init.d/rc 2
+l3:3:wait:/etc/rc.d/init.d/rc 3
+l4:4:wait:/etc/rc.d/init.d/rc 4
+l5:5:wait:/etc/rc.d/init.d/rc 5
+l6:6:wait:/etc/rc.d/init.d/rc 6
+
+ca:12345:ctrlaltdel:/sbin/shutdown <span class="nt">-t1</span> <span class="nt">-a</span> <span class="nt">-r</span> now
+
+su:S016:once:/sbin/sulogin
+
+1:2345:respawn:/sbin/agetty <span class="nt">--noclear</span> tty1 9600
+2:2345:respawn:/sbin/agetty tty2 9600
+3:2345:respawn:/sbin/agetty tty3 9600
+4:2345:respawn:/sbin/agetty tty4 9600
+5:2345:respawn:/sbin/agetty tty5 9600
+6:2345:respawn:/sbin/agetty tty6 9600
+
+<span class="c"># End /etc/inittab</span>
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="clock">clock</h4>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="c"># Begin /etc/sysconfig/clock</span>
+
+<span class="nv">UTC</span><span class="o">=</span>1
+
+<span class="c"># Set this to any options you might need to give to hwclock,</span>
+<span class="c"># such as machine hardware clock type for Alphas.</span>
+<span class="nv">CLOCKPARAMS</span><span class="o">=</span>
+
+<span class="c"># End /etc/sysconfig/clock</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="console">console</h4>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="code"><pre><span class="c"># Begin /etc/sysconfig/console</span>
+
+<span class="nv">KEYMAP</span><span class="o">=</span><span class="s2">"trq"</span>
+<span class="nv">FONT</span><span class="o">=</span><span class="s2">"iso09.16"</span>
+
+<span class="c"># End /etc/sysconfig/console</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="profile">profile</h4>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="code"><pre><span class="nb">cat</span> <span class="o">&gt;</span> /etc/profile &lt;&lt; <span class="s2">"EOF"</span>
+<span class="c"># Begin /etc/profile</span>
+
+<span class="nb">export </span><span class="nv">LANG</span><span class="o">=</span>tr_TR.utf8
+
+<span class="c"># End /etc/profile</span>
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="inputrc">inputrc</h4>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+</pre></td><td class="code"><pre><span class="nb">cat</span> <span class="o">&gt;</span> /etc/inputrc &lt;&lt; <span class="s2">"EOF"</span>
+<span class="c"># Begin /etc/inputrc</span>
+<span class="c"># Modified by Chris Lynn &lt;roryo@roryo.dynup.net&gt;</span>
+
+<span class="c"># Allow the command prompt to wrap to the next line</span>
+<span class="nb">set </span>horizontal-scroll-mode Off
+
+<span class="c"># Enable 8bit input</span>
+<span class="nb">set </span>meta-flag On
+<span class="nb">set </span>input-meta On
+
+<span class="c"># Turns off 8th bit stripping</span>
+<span class="nb">set </span>convert-meta Off
+
+<span class="c"># Keep the 8th bit for display</span>
+<span class="nb">set </span>output-meta On
+
+<span class="c"># none, visible or audible</span>
+<span class="nb">set </span>bell-style none
+
+<span class="c"># All of the following map the escape sequence of the value</span>
+<span class="c"># contained in the 1st argument to the readline specific functions</span>
+<span class="s2">"</span><span class="se">\e</span><span class="s2">Od"</span>: backward-word
+<span class="s2">"</span><span class="se">\e</span><span class="s2">Oc"</span>: forward-word
+
+<span class="c"># for linux console</span>
+<span class="s2">"</span><span class="se">\e</span><span class="s2">[1~"</span>: beginning-of-line
+<span class="s2">"</span><span class="se">\e</span><span class="s2">[4~"</span>: end-of-line
+<span class="s2">"</span><span class="se">\e</span><span class="s2">[5~"</span>: beginning-of-history
+<span class="s2">"</span><span class="se">\e</span><span class="s2">[6~"</span>: end-of-history
+<span class="s2">"</span><span class="se">\e</span><span class="s2">[3~"</span>: delete-char
+<span class="s2">"</span><span class="se">\e</span><span class="s2">[2~"</span>: quoted-insert
+
+<span class="c"># for xterm</span>
+<span class="s2">"</span><span class="se">\e</span><span class="s2">OH"</span>: beginning-of-line
+<span class="s2">"</span><span class="se">\e</span><span class="s2">OF"</span>: end-of-line
+
+<span class="c"># for Konsole</span>
+<span class="s2">"</span><span class="se">\e</span><span class="s2">[H"</span>: beginning-of-line
+<span class="s2">"</span><span class="se">\e</span><span class="s2">[F"</span>: end-of-line
+
+<span class="c"># End /etc/inputrc</span>
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="shells">shells</h4>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="code"><pre><span class="nb">cat</span> <span class="o">&gt;</span> /etc/shells &lt;&lt; <span class="s2">"EOF"</span>
+<span class="c"># Begin /etc/shells</span>
+
+/bin/sh
+/bin/bash
+
+<span class="c"># End /etc/shells</span>
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="fstab">fstab</h4>
+<p>Bu dosya önemli. Bu dosya sizin disk bölümlerinizi bağlayacak olan dosya. En başta nasıl planladıysanız ona göre düzenleyin.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre></td><td class="code"><pre><span class="nb">cat</span> <span class="o">&gt;</span> /etc/fstab &lt;&lt; <span class="s2">"EOF"</span>
+<span class="c"># Begin /etc/fstab</span>
+
+<span class="c"># file system  mount-point  type     options   dump  fsck</span>
+<span class="c">#                                                       order</span>
+
+/dev/&lt;xxx&gt;   /          &lt;fff&gt;    defaults            1   1
+/dev/&lt;yyy&gt;   swap       swap     <span class="nv">pri</span><span class="o">=</span>1               0   0
+proc         /proc      proc     nosuid,noexec,nodev 0   0
+sysfs        /sys       sysfs    nosuid,noexec,nodev 0   0
+devpts       /dev/pts   devpts   <span class="nv">gid</span><span class="o">=</span>5,mode<span class="o">=</span>620      0   0
+tmpfs        /run       tmpfs    defaults            0   0
+devtmpfs     /dev       devtmpfs <span class="nv">mode</span><span class="o">=</span>0755,nosuid    0   0
+
+<span class="c"># End /etc/fstab</span>
+EOF
+
+hdparm <span class="nt">-I</span> /dev/sda | <span class="nb">grep </span>NCQ</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="linux-çekirdekkernel-derleme">Linux Çekirdek(Kernel) Derleme</h4>
+<p>Çekirdeği kendinize göre düzenleyeceksiniz. Kesinlikle yapmamız gereken bir düzenlemeyi kitabımız bize söylüyor. Onun dışında eğer siz de benim gibi USB’ye kuruyorsanız ve versiyon 3.0 ise çekirdekte aktifleştirin.</p>
+
+<blockquote>
+  <p>Device Drivers  —&gt;<br />
+—&gt;Generic Driver Options  —&gt;<br />
+—&gt;—&gt;[ ] Support for uevent helper [CONFIG_UEVENT_HELPER]<br />
+—&gt;—&gt;[*] Maintain a devtmpfs filesystem to mount at /dev [CONFIG_DEVTMPFS]</p>
+</blockquote>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+</pre></td><td class="code"><pre><span class="nb">cd</span> /sources
+<span class="nb">tar </span>xvf linux-3.19.tar.xz
+<span class="nb">cd </span>linux-3.19
+
+make mrproper
+make <span class="nv">LANG</span><span class="o">=</span>tr_TR <span class="nv">LC_ALL</span><span class="o">=</span> menuconfig
+make
+make modules_install
+
+cp <span class="nt">-v</span> arch/x86/boot/bzImage /boot/vmlinuz-3.19-lfs-7.7
+cp <span class="nt">-v</span> System.map /boot/System.map-3.19
+cp <span class="nt">-v</span> .config /boot/config-3.19
+
+install <span class="nt">-d</span> /usr/share/doc/linux-3.19
+cp <span class="nt">-r</span> Documentation/<span class="k">*</span> /usr/share/doc/linux-3.19
+
+install <span class="nt">-v</span> <span class="nt">-m755</span> <span class="nt">-d</span> /etc/modprobe.d
+<span class="nb">cat</span> <span class="o">&gt;</span> /etc/modprobe.d/usb.conf &lt;&lt; <span class="s2">"EOF"</span>
+<span class="c"># Begin /etc/modprobe.d/usb.conf</span>
+
+install ohci_hcd /sbin/modprobe ehci_hcd <span class="p">;</span> /sbin/modprobe <span class="nt">-i</span> ohci_hcd <span class="p">;</span> <span class="nb">true
+</span>install uhci_hcd /sbin/modprobe ehci_hcd <span class="p">;</span> /sbin/modprobe <span class="nt">-i</span> uhci_hcd <span class="p">;</span> <span class="nb">true</span>
+
+<span class="c"># End /etc/modprobe.d/usb.conf</span>
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="grub-yapılandırması">Grub Yapılandırması</h4>
+<p>İsterseniz <strong>grub</strong>u kullandığınız sistemden güncelleyin fakat ben kitaba uygun gidiyorum.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="code"><pre>grub-install /dev/sdX# x<span class="s1">'i siz dolduracaksınız
+
+cat &gt; /boot/grub/grub.cfg &lt;&lt; "EOF"
+# Begin /boot/grub/grub.cfg
+set default=0
+set timeout=5
+
+insmod ext2
+set root=(hd0,X)
+
+menuentry "GNU/Linux, Linux 3.19-lfs-7.7" {
+        linux   /boot/vmlinuz-3.19-lfs-7.7 root=/dev/&lt;xxx&gt; ro
+}
+EOF</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="chroot-ile-son-ayarlar">Chroot ile son ayarlar</h4>
+<p>LFS bilgilerimizi kaydediyoruzve gurularımız şu formu doldurmamızı rica ediyorlar. <a href="http://www.linuxfromscratch.org/cgi-bin/lfscounter.php">lfscounter</a>
+<strong>name</strong>-&gt;<em>adınız</em>, <strong>version</strong>-&gt;<em>7.7</em>, <strong>SVN date</strong>-&gt;<em>boş</em></p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="code"><pre><span class="nb">echo </span>7.7 <span class="o">&gt;</span> /etc/lfs-release# LFS sürümümüzü kaydediyoruz
+
+<span class="nb">cat</span> <span class="o">&gt;</span> /etc/lsb-release &lt;&lt; <span class="s2">"EOF"</span>
+<span class="nv">DISTRIB_ID</span><span class="o">=</span><span class="s2">"Linux From Scratch"</span>
+<span class="nv">DISTRIB_RELEASE</span><span class="o">=</span><span class="s2">"7.7"</span>
+<span class="nv">DISTRIB_CODENAME</span><span class="o">=</span><span class="s2">"&lt;your name here&gt;"</span>
+<span class="nv">DISTRIB_DESCRIPTION</span><span class="o">=</span><span class="s2">"Linux From Scratch"</span>
+EOF</pre></td></tr></tbody></table></code></pre></figure>
+
+<h4 id="çıkış">Çıkış</h4>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="code"><pre><span class="nb">logout
+
+</span>umount <span class="nt">-v</span> <span class="nv">$LFS</span>/dev/pts
+umount <span class="nt">-v</span> <span class="nv">$LFS</span>/dev
+umount <span class="nt">-v</span> <span class="nv">$LFS</span>/run
+umount <span class="nt">-v</span> <span class="nv">$LFS</span>/proc
+umount <span class="nt">-v</span> <span class="nv">$LFS</span>/sys
+
+umount <span class="nt">-v</span> <span class="nv">$LFS</span></pre></td></tr></tbody></table></code></pre></figure>
+
+<h2 id="merhaba-lfs">Merhaba LFS</h2>
+<p><img src="/images/posts/grub.jpg" alt="lfs-grub" class="img-fluid img-thumbnail" /></p>
+
+<p>Artık bilgisayarımızı yeniden başlatabiliriz. Baya sorunlu bir boot süreci yaşadığım için ben çekirdeği güncelledim. Zaten siz de nasıl yapacağınızı biliyorsunuz. Eğer açılışta bir sorunla karşılaşırsanız lütfen bana fotoğrafını gönderin. Ya <strong>grub.cfg</strong> ya da kernel sorunu çıkıyor. Yardımcı olmaya çalışırım.</p>
+
+</article>
+<div class="col-sm-12">
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {this.page.url = 'https://www.ozanselte.com/lfs-5-sisteme-giris-boot/';};
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://ozanselte.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</div></div>
+<footer class="container mb-3">
+<div class="row">
+<div class="col text-center"><a class="nav-link" href="https://github.com/ozanselte"><i class="fab fa-github fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.facebook.com/ozanselte"><i class="fab fa-facebook fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://twitter.com/ozanselte"><i class="fab fa-twitter fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.instagram.com/ozanselte"><i class="fab fa-instagram fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://www.linkedin.com/in/ozanselte"><i class="fab fa-linkedin fa-lg"></i> ozanselte</a></div>
+<div class="col text-center"><a class="nav-link" href="https://t.me/ozanselte"><i class="fab fa-telegram fa-lg"></i> ozanselte</a></div>
+</div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '');
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+</body>
+</html>
